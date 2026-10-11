@@ -40,5 +40,11 @@ export {
 	type Word,
 	wordAt
 } from './core/segment.ts';
-export { sentenceRange, type TextSource, wordRange } from './core/source.ts';
+export {
+	sentenceRange,
+	type TextSource,
+	toOverlay,
+	wordAtPoint,
+	wordRange
+} from './core/source.ts';
 export type { Box } from './core/types.ts';

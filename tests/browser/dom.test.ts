@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { createHighlighter } from '../../src/core/highlighter.ts';
+import { wordAtPoint } from '../../src/core/source.ts';
 import { domSource } from '../../src/dom/source.ts';
 
 const mount = (html: string) => {
@@ -67,6 +68,16 @@ describe('domSource', () => {
 		sel?.addRange(r);
 		expect(s.rangeFromSelection(sel)).toEqual({ start: s.words[1].start, end: w.end });
 		expect(sel?.toString()).toBe('beta gamma');
+	});
+
+	it('finds the word under a point through the overlay', () => {
+		const { root, svg } = mount('<p>Alpha beta gamma.</p>');
+		const s = domSource(root);
+		createHighlighter(svg, s, { animate: false });
+		const r = s.toRange(s.words[2].start, s.words[2].end)?.getBoundingClientRect();
+		if (!r) throw new Error('no rect');
+		expect(wordAtPoint(s, svg, r.left + 2, r.top + r.height / 2)).toBe(2);
+		expect(wordAtPoint(s, svg, r.right + 200, r.top)).toBe(-1);
 	});
 
 	it('finds the character under a point', () => {

@@ -29,9 +29,23 @@
 	fill: var(--gl-mark);
 }
 
-/* Dark backgrounds: multiply would darken the text instead of tinting it. */
+/*
+ * Dark text backgrounds: multiply would darken the text instead of tinting it, so the overlay
+ * screens a dimmer colour. Applies with a `dark` class or `data-theme="dark"` on <html>, or the
+ * system setting when <html> has neither `light` nor `data-theme="light"`.
+ * An overlay over paper that stays white (a PDF page) opts out with data-gl-theme="light".
+ */
+:root.dark .gl-overlay:not([data-gl-theme='light']),
+:root[data-theme='dark'] .gl-overlay:not([data-gl-theme='light']),
+.gl-overlay[data-gl-theme='dark'] {
+	--gl-sentence: oklch(0.55 0.1 95 / 0.35);
+	--gl-word: oklch(0.7 0.14 85 / 0.45);
+	--gl-selection: oklch(0.6 0.12 250 / 0.4);
+	--gl-mark: oklch(0.6 0.12 140 / 0.35);
+	--gl-blend: screen;
+}
 @media (prefers-color-scheme: dark) {
-	.gl-overlay:where(:not([data-gl-theme='light'])) {
+	:root:not(.light):not([data-theme='light']) .gl-overlay:not([data-gl-theme='light']) {
 		--gl-sentence: oklch(0.55 0.1 95 / 0.35);
 		--gl-word: oklch(0.7 0.14 85 / 0.45);
 		--gl-selection: oklch(0.6 0.12 250 / 0.4);

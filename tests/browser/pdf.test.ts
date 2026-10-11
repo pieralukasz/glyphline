@@ -3,6 +3,7 @@ import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { afterEach, describe, expect, it } from 'vitest';
 import '../../src/pdf.css';
 import { createHighlighter } from '../../src/core/highlighter.ts';
+import { wordAtPoint } from '../../src/core/source.ts';
 import { geometryFromTextLayer, partBoxes } from '../../src/pdf/geometry.ts';
 import { pdfSource } from '../../src/pdf/source.ts';
 import pdfUrl from '../fixtures/highlight-stress.pdf?url';
@@ -59,6 +60,12 @@ describe('pdfSource', () => {
 		const boxB = b.base.boxes(w.start, w.end, b.svg);
 		expect(boxB).toEqual(boxA);
 		expect(b.base.viewBox(b.svg)).toEqual({ x: 0, y: 0, w: b.base.width, h: b.base.height });
+		// a click in the middle of the word, in screen px at zoom 2, hits it
+		createHighlighter(b.svg, b.base, { animate: false });
+		const o = b.svg.getBoundingClientRect();
+		const [box] = boxB;
+		const hit = wordAtPoint(b.base, b.svg, o.left + (box.x + box.w / 2) * 2, o.top + (box.y + box.h / 2) * 2);
+		expect(hit).toBe(w.index);
 		await b.doc.loadingTask.destroy();
 	});
 

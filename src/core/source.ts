@@ -37,3 +37,39 @@ export const sentenceRange = (source: TextSource, i: number): TextRange | null =
 	const s = source.sentences[i];
 	return s ? { start: s.start, end: s.end } : null;
 };
+
+/**
+ * Overlay coordinates of a viewport point: the inverse of how the svg's viewBox is drawn
+ * (`preserveAspectRatio="none"`, so x and y scale independently).
+ */
+export function toOverlay(overlay: Element, clientX: number, clientY: number): [number, number] {
+	const r = overlay.getBoundingClientRect();
+	const v = (overlay as SVGSVGElement).viewBox?.baseVal;
+	const vw = v?.width || r.width || 1;
+	const vh = v?.height || r.height || 1;
+	return [
+		(v?.x ?? 0) + ((clientX - r.left) / (r.width || 1)) * vw,
+		(v?.y ?? 0) + ((clientY - r.top) / (r.height || 1)) * vh
+	];
+}
+
+/**
+ * Index of the word under a viewport point (a click or pointer position), or -1. `slop` grows
+ * each word box by that many overlay units, so the gap between two words still hits one of them.
+ */
+export function wordAtPoint(
+	source: TextSource,
+	overlay: Element,
+	clientX: number,
+	clientY: number,
+	{ slop = 1 } = {}
+): number {
+	const [x, y] = toOverlay(overlay, clientX, clientY);
+	for (const w of source.words) {
+		for (const b of source.boxes(w.start, w.end, overlay)) {
+			if (x >= b.x - slop && x <= b.x + b.w + slop && y >= b.y - slop && y <= b.y + b.h + slop)
+				return w.index;
+		}
+	}
+	return -1;
+}

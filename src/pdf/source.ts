@@ -42,6 +42,15 @@ export interface PdfTextSource extends TextSource {
 	/** Text items the glyph walk could not place and that took boxes from a fallback. */
 	readonly fallbackItems: number;
 	/**
+	 * Per-character boxes of each method on its own: M1 `items`, M3 `glyphs` (raw, with gaps) and
+	 * M2 `range` (null until `withTextLayer`). For comparing methods; `geometry` is what is drawn.
+	 */
+	readonly methods: {
+		readonly items: CharGeometry;
+		readonly glyphs: CharGeometry;
+		readonly range: CharGeometry | null;
+	};
+	/**
 	 * A copy that also measures the native pdf.js text layer and uses it as the first fallback.
 	 * `textDivs` is `TextLayer#textDivs`, `container` the text layer element, `scale` its zoom.
 	 */
@@ -129,7 +138,11 @@ function build(loaded: Loaded, range: CharGeometry | null, textDivs: HTMLElement
 	};
 
 	const source: PdfTextSource = {
-		...loaded,
+		page: loaded.page,
+		pageText,
+		width: loaded.width,
+		height: loaded.height,
+		methods: { items: loaded.items, glyphs: loaded.glyphs, range },
 		text: pageText.text,
 		words: pageText.words,
 		sentences: pageText.sentences,
