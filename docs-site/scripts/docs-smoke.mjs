@@ -39,7 +39,10 @@ const fail = (msg) => {
   console.log(`  FAIL ${msg}`);
 };
 
-const browser = await chromium.launch();
+// RESOLVE=host:ip pins a hostname to an IP when the local DNS cache is stale for a new subdomain
+const browser = await chromium.launch(
+  process.env.RESOLVE ? { args: [`--host-resolver-rules=MAP ${process.env.RESOLVE.replace(":", " ")}`] } : {},
+);
 for (const [label, viewport, scheme] of [
   ["desktop", { width: 1440, height: 900 }, "light"],
   ["phone", { width: 390, height: 844 }, "dark"],
@@ -50,6 +53,7 @@ for (const [label, viewport, scheme] of [
     deviceScaleFactor: 2,
   });
   const page = await ctx.newPage();
+  page.setDefaultTimeout(Number(process.env.TIMEOUT ?? 30_000));
   const errors = [];
   page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
   page.on("pageerror", (e) => errors.push(String(e)));
@@ -276,9 +280,8 @@ for (const [label, viewport, scheme] of [
   if (!index.includes("/docs/agents"))
     fail(`${label} llms.txt has no agents link`);
 
-  // search
-  await page.goto(`${BASE}/api/search`);
-  const body = await page.content();
+  // search index (a static file: a host may serve it as a download, so read it as a request)
+  const body = await (await page.request.get(`${BASE}/api/search`)).text();
   if (!body.includes("selection"))
     fail(`${label} search index missing content`);
 
