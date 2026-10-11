@@ -71,7 +71,8 @@
 	"types": "./dist/index.d.ts",
 	"files": [
 		"dist",
-		"README.md"
+		"README.md",
+		"AGENTS.md"
 	],
 	"publishConfig": {
 		"access": "public"

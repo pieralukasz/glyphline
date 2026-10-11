@@ -13,6 +13,7 @@ const pages = [
   "/docs",
   "/docs/getting-started",
   "/docs/playground",
+  "/docs/agents",
   "/docs/pdf",
   "/docs/html",
   "/docs/selection",
@@ -259,6 +260,21 @@ for (const [label, viewport, scheme] of [
     await page
       .locator("[data-svelte-host]")
       .screenshot({ path: `${SHOTS}/${label}_svelte-demo.png` });
+
+  // agent-facing text
+  for (const path of [
+    "/llms.txt",
+    "/llms-full.txt",
+    "/llms.mdx/docs/react/content.md",
+  ]) {
+    const r = await page.request.get(BASE + path);
+    const text = await r.text();
+    if (r.status() !== 200 || !text.includes("glyphline"))
+      fail(`${label} ${path}: ${r.status()}`);
+  }
+  const index = await (await page.request.get(`${BASE}/llms.txt`)).text();
+  if (!index.includes("/docs/agents"))
+    fail(`${label} llms.txt has no agents link`);
 
   // search
   await page.goto(`${BASE}/api/search`);

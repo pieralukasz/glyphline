@@ -157,6 +157,50 @@ export default function HomePage() {
         </p>
       </Section>
 
+      <Section
+        eyebrow="For humans and agents"
+        title="Docs you can read, docs your agent can load"
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="rounded-xl border bg-fd-card p-5">
+            <p className="font-medium">For humans</p>
+            <p className="mt-2 text-sm text-fd-muted-foreground">
+              Live demos on every page, a{" "}
+              <Link className="underline" href="/docs/playground">
+                playground
+              </Link>{" "}
+              for every option, and separate{" "}
+              <Link className="underline" href="/docs/react">
+                React
+              </Link>{" "}
+              and{" "}
+              <Link className="underline" href="/docs/svelte">
+                Svelte
+              </Link>{" "}
+              sections.
+            </p>
+          </div>
+          <div className="rounded-xl border bg-fd-card p-5">
+            <p className="font-medium">For agents</p>
+            <p className="mt-2 text-sm text-fd-muted-foreground">
+              <a className="underline" href="/llms.txt">
+                llms.txt
+              </a>
+              ,{" "}
+              <a className="underline" href="/llms-full.txt">
+                llms-full.txt
+              </a>
+              , Markdown for every page, and <code>AGENTS.md</code> inside the
+              npm package with the rules that are easy to get wrong.{" "}
+              <Link className="underline" href="/docs/agents">
+                How to point your agent at them
+              </Link>
+              .
+            </p>
+          </div>
+        </div>
+      </Section>
+
       <footer className="border-t py-10 text-center font-mono text-xs text-fd-muted-foreground">
         <p>
           Made by{" "}

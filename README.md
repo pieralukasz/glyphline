@@ -82,6 +82,11 @@ hl.update({ sentence: 3, word: 41 });
 | `glyphline/style.css` | default colours as CSS custom properties |
 | `glyphline/pdf.css` | the minimum CSS for the native pdf.js text layer |
 
+## For humans and agents
+
+- Humans: docs with live demos at https://glyphline.lucaspiera.com, separate React and Svelte sections.
+- Coding agents: `node_modules/glyphline/AGENTS.md` (shipped in the package) lists the rules that are easy to get wrong; https://glyphline.lucaspiera.com/llms.txt and `/llms-full.txt` have the whole docs as Markdown.
+
 ## Development
 
 A bun workspace: `packages/glyphline` (the published package: `src/core`, `src/pdf`, `src/dom`, `src/react`, `src/svelte`) and `docs-site` (Fumadocs).
