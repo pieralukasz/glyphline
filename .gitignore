@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+test-results/
+playwright-report/
+*.tsbuildinfo
+*.tgz
+.DS_Store
+.vercel
+.env*
+docs-site/.next/
+docs-site/out/
+docs-site/.source/
+docs-site/node_modules/
+tests/browser/__screenshots__/

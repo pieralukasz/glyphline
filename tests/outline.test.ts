@@ -1,0 +1,167 @@
+import { describe, expect, it } from 'vitest';
+import {
+	groupRuns,
+	mergeLines,
+	morphShape,
+	outlinePath,
+	sentenceShape,
+	shapePath,
+	stretchBox
+} from '../src/core/outline.ts';
+
+const w = (x: number, y: number, w = 30, h = 10) => ({ x, y, w, h });
+
+describe('mergeLines', () => {
+	it('merges the words of one line into one box', () => {
+		const lines = mergeLines([w(10, 100), w(45, 100), w(80, 100)]);
+		expect(lines).toEqual([{ x: 10, y: 100, w: 100, h: 10 }]);
+	});
+
+	it('keeps a subscript or a symbol from a smaller font on the same line', () => {
+		const lines = mergeLines([w(10, 100), w(42, 104, 6, 6), w(50, 100)]);
+		expect(lines).toHaveLength(1);
+		expect(lines[0].x).toBe(10);
+		expect(lines[0].w).toBe(70);
+	});
+
+	it('splits at a column gap wider than ~1.5 em', () => {
+		const lines = mergeLines([w(10, 100), w(45, 100), w(200, 100), w(235, 100)]);
+		expect(lines).toHaveLength(2);
+	});
+
+	it('keeps separate lines separate', () => {
+		const lines = mergeLines([w(10, 100), w(10, 115)]);
+		expect(lines).toHaveLength(2);
+	});
+});
+
+describe('mergeLines on vertical text', () => {
+	it('merges stacked words of a rotated line into one tall box', () => {
+		const v = (y: number, h: number) => ({ x: 418, y, w: 12, h });
+		const lines = mergeLines([v(260, 18), v(281, 35), v(319, 10), v(331, 21), v(355, 27)]);
+		expect(lines).toEqual([{ x: 418, y: 260, w: 12, h: 122 }]);
+		expect(groupRuns([v(260, 18), v(281, 35), v(319, 10)])).toHaveLength(1);
+	});
+});
+
+describe('groupRuns', () => {
+	it('chains consecutive lines of one column into one run and closes the gap', () => {
+		const runs = groupRuns([w(10, 100), w(45, 100), w(10, 114), w(45, 114)]);
+		expect(runs).toHaveLength(1);
+		expect(runs[0]).toHaveLength(2);
+		expect(runs[0][0].y + runs[0][0].h).toBeCloseTo(runs[0][1].y);
+	});
+
+	it('starts a new run for a second column', () => {
+		const runs = groupRuns([w(10, 100), w(10, 114), w(300, 100), w(300, 114)]);
+		expect(runs).toHaveLength(2);
+	});
+});
+
+describe('outlinePath', () => {
+	it('draws one closed path per run, not one per word', () => {
+		const d = outlinePath([w(10, 100), w(45, 100), w(80, 100), w(10, 114), w(45, 114)]);
+		expect((d.match(/Z/g) ?? []).length).toBe(1);
+		expect(d.startsWith('M')).toBe(true);
+	});
+
+	// the windward sentence: starts mid-line, one full line, ends early on the third line
+	const windward = [
+		{ x: 130, y: 10, w: 370, h: 12 },
+		{ x: 15, y: 30, w: 485, h: 12 },
+		{ x: 15, y: 50, w: 105, h: 12 }
+	];
+
+	/** straight segments of a path (the arcs only round the corners). */
+	function segments(d: string) {
+		const pts: [number, number][] = [];
+		for (const m of d.matchAll(/([ML])(-?[\d.]+) (-?[\d.]+)/g)) pts.push([+m[2], +m[3]]);
+		const ends: [number, number][] = [];
+		for (const m of d.matchAll(/A[\d.]+ [\d.]+ 0 0 [01] (-?[\d.]+) (-?[\d.]+)/g))
+			ends.push([+m[1], +m[2]]);
+		// each L starts at the previous arc's end
+		return pts.slice(1).map((p, i) => [ends[i], p] as const);
+	}
+
+	it('has no slanted edges where lines meet, only horizontal and vertical ones', () => {
+		const d = outlinePath(windward);
+		for (const [a, b] of segments(d)) {
+			const horizontal = Math.abs(a[1] - b[1]) < 0.01;
+			const vertical = Math.abs(a[0] - b[0]) < 0.01;
+			expect(horizontal || vertical).toBe(true);
+		}
+	});
+
+	it('does not zigzag: every corner is a real step of the outline', () => {
+		// 3 lines of different extent: 8 corners (start step, two ends of the full line, end step)
+		expect((outlinePath(windward).match(/A/g) ?? []).length).toBe(8);
+	});
+
+	it('aligns justified line ends that differ by a fraction of a pixel', () => {
+		const shape = sentenceShape([
+			{ x: 15, y: 10, w: 485.4, h: 12 },
+			{ x: 15.3, y: 30, w: 484.6, h: 12 }
+		]);
+		const [a, b] = shape[0];
+		expect(a.x).toBe(b.x);
+		expect(a.x + a.w).toBeCloseTo(b.x + b.w);
+		// two equal lines are one rounded rectangle: 4 corners
+		expect((shapePath(shape).match(/A/g) ?? []).length).toBe(4);
+	});
+});
+
+describe('morphShape', () => {
+	it('keeps the lines touching while one sentence turns into the next', () => {
+		const from = sentenceShape([w(100, 100, 200), w(10, 114, 150)]);
+		const to = sentenceShape([w(160, 114, 140), w(10, 128, 290), w(10, 142, 60)]);
+		const mid = morphShape(from, to)?.(0.5);
+		expect(mid?.[0]).toHaveLength(3);
+		const run = mid?.[0] ?? [];
+		for (let i = 0; i < run.length - 1; i++) {
+			expect(run[i].y + run[i].h).toBeCloseTo(run[i + 1].y);
+		}
+		expect(morphShape(from, to)?.(1)).toEqual(to);
+	});
+
+	it('stretches along the line instead of sliding when the next sentence is on the same line', () => {
+		const from = sentenceShape([w(10, 100, 200)]);
+		const to = sentenceShape([w(240, 100, 150)]);
+		const half = morphShape(from, to)?.(0.5)?.[0][0];
+		// the old sentence still starts where it did, the box already reaches the end of the new one
+		expect(half?.x).toBeCloseTo(from[0][0].x);
+		expect((half?.x ?? 0) + (half?.w ?? 0)).toBeCloseTo(to[0][0].x + to[0][0].w);
+		expect(morphShape(from, to)?.(1)).toEqual(to);
+	});
+
+	it('refuses to pair a one-column sentence with a two-column one', () => {
+		const one = sentenceShape([w(10, 100)]);
+		const two = sentenceShape([w(10, 100), w(300, 100)]);
+		expect(morphShape(one, two)).toBeNull();
+	});
+});
+
+describe('stretchBox', () => {
+	const a = { x: 10, y: 100, w: 30, h: 10 };
+	const b = { x: 80, y: 100, w: 40, h: 10 };
+	it('first reaches the next word with the leading edge, then pulls the trailing edge', () => {
+		const half = stretchBox(a, b, 0.5);
+		expect(half.x).toBe(10);
+		expect(half.x + half.w).toBe(120);
+		expect(stretchBox(a, b, 1)).toEqual(b);
+	});
+	it('stretches to the left when the next word is earlier on the line', () => {
+		const half = stretchBox(b, a, 0.5);
+		expect(half.x).toBe(10);
+		expect(half.x + half.w).toBe(120);
+	});
+});
+
+describe('mergeLines bridging', () => {
+	it('merges two line boxes that a later box connects', () => {
+		// [0..10] and [50..60] are 40 apart (> 1.5 em); [20..40] bridges them to gaps of 10
+		const lines = mergeLines([w(0, 0, 10, 10), w(50, 0, 10, 10), w(20, 1, 20, 10)]);
+		expect(lines).toHaveLength(1);
+		expect(lines[0].x).toBe(0);
+		expect(lines[0].w).toBe(60);
+	});
+});
