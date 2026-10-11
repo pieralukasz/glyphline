@@ -1,6 +1,6 @@
 import { domSource } from 'glyphline/dom';
 import { afterEach, describe, expect, it } from 'vitest';
-import { glyphline, highlight } from '../src/lib/action.js';
+import { glyphline, highlight } from '../../src/svelte/action.js';
 
 afterEach(() => {
 	document.body.innerHTML = '';

@@ -1,7 +1,7 @@
 <!-- Copied from docs-site/content/docs/svelte/selection.mdx -->
 <script lang="ts">
 import type { Mark, TextRange } from 'glyphline';
-import { domText, GlyphOverlay } from 'svelte-glyphline';
+import { domText, GlyphOverlay } from 'glyphline/svelte';
 
 const text = domText();
 let selected = $state<{ range: TextRange; text: string } | null>(null);

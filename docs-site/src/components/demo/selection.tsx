@@ -1,8 +1,8 @@
 "use client";
 import type { Mark, TextRange } from "glyphline";
 import type { PdfTextSource } from "glyphline/pdf";
+import { GlyphOverlay, useDomSource } from "glyphline/react";
 import { useEffect, useMemo, useState } from "react";
-import { GlyphOverlay, useDomSource } from "react-glyphline";
 import { Button, Segmented, Toggle, Toolbar } from "./controls";
 import { PdfPage } from "./pdf";
 

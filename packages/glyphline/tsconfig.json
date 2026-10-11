@@ -4,6 +4,7 @@
 		"module": "ESNext",
 		"moduleResolution": "Bundler",
 		"lib": ["ES2022", "DOM", "DOM.Iterable"],
+		"jsx": "react-jsx",
 		"strict": true,
 		"noImplicitOverride": true,
 		"isolatedModules": true,
@@ -12,7 +13,16 @@
 		"declaration": true,
 		"skipLibCheck": true,
 		"noEmit": true,
-		"types": ["node"]
+		"types": ["node"],
+		"paths": {
+			"glyphline": ["./src/index.ts"],
+			"glyphline/pdf": ["./src/pdf/index.ts"],
+			"glyphline/dom": ["./src/dom/index.ts"],
+			"glyphline/react": ["./src/react/index.ts"],
+			"glyphline/svelte": ["./src/svelte/index.ts"],
+			"glyphline/style.css": ["./src/css.d.ts"],
+			"glyphline/pdf.css": ["./src/css.d.ts"]
+		}
 	},
 	"include": ["src", "tests", "*.config.ts"]
 }

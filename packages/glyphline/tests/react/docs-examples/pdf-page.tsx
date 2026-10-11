@@ -1,10 +1,10 @@
 // Copied from docs-site/content/docs/react/pdf.mdx; tsc keeps the docs example compiling.
 'use client';
 import { type PdfTextSource, pdfSource } from 'glyphline/pdf';
+import { GlyphOverlay, useAsyncSource } from 'glyphline/react';
 import type { PDFPageProxy } from 'pdfjs-dist';
 import { OPS, TextLayer } from 'pdfjs-dist';
 import { useEffect, useRef, useState } from 'react';
-import { GlyphOverlay, useAsyncSource } from 'react-glyphline';
 import 'glyphline/style.css';
 import 'glyphline/pdf.css';
 

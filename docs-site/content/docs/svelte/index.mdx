@@ -1,21 +1,21 @@
 ---
 title: Svelte overview
-description: svelte-glyphline, the GlyphOverlay component, the highlight action and reactive sources for Svelte 5.
+description: glyphline/svelte, the GlyphOverlay component, the highlight action and reactive sources for Svelte 5.
 ---
 
-The demo below is a Svelte 5 app (mounted into this React page) using `svelte-glyphline`.
+The demo below is a Svelte 5 app (mounted into this React page) using `glyphline/svelte`.
 
 <SvelteDemo />
 
 ## Install
 
 ```sh
-bun add svelte-glyphline
+bun add glyphline
 # for PDF pages
 bun add pdfjs-dist
 ```
 
-`svelte-glyphline` depends on `glyphline` (the core) and has `svelte@5` as a peer. Import the stylesheet once, from the core:
+The Svelte adapter ships inside `glyphline` as `glyphline/svelte` (compiled by your Svelte setup, like any Svelte library); Svelte 5 is an optional peer. Import the stylesheet once:
 
 ```ts
 import "glyphline/style.css";
@@ -25,7 +25,7 @@ import "glyphline/style.css";
 
 ```svelte
 <script lang="ts">
-  import { domText, GlyphOverlay } from "svelte-glyphline";
+  import { domText, GlyphOverlay } from "glyphline/svelte";
   import "glyphline/style.css";
 
   let { word, sentence }: { word: number; sentence: number } = $props();

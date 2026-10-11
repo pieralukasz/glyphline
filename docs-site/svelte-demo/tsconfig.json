@@ -12,7 +12,7 @@
     "paths": {
       "glyphline": ["../../packages/glyphline/src/index.ts"],
       "glyphline/dom": ["../../packages/glyphline/src/dom/index.ts"],
-      "svelte-glyphline": ["../../packages/svelte-glyphline/src/lib/index.ts"]
+      "glyphline/svelte": ["../../packages/glyphline/src/svelte/index.ts"]
     }
   },
   "include": ["src"]

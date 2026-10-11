@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { HighlighterOptions } from 'glyphline';
-import { domText, GlyphOverlay } from '../src/lib/index.js';
+import { domText, GlyphOverlay } from '../../src/svelte/index.js';
 
 let { word = 0, lines = 1, options = { animate: false } as HighlighterOptions } = $props();
 const text = domText();

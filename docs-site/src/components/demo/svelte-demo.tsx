@@ -4,7 +4,7 @@ import { asset } from "@/lib/shared";
 
 /**
  * Mounts the Svelte demo (svelte-demo/, built by Vite into public/svelte-demo/demo.js). The page is
- * React, the demo inside it is a real Svelte 5 app using svelte-glyphline.
+ * React, the demo inside it is a real Svelte 5 app using glyphline/svelte.
  */
 export function SvelteDemo() {
   const host = useRef<HTMLDivElement>(null);

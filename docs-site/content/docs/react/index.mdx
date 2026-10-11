@@ -1,21 +1,21 @@
 ---
 title: React overview
-description: react-glyphline, the GlyphOverlay component and hooks for React 18 and 19.
+description: glyphline/react, the GlyphOverlay component and hooks for React 18 and 19.
 ---
 
-Every demo on this site is built with `react-glyphline`.
+Every demo on this site is built with `glyphline/react`.
 
 <HtmlReadAlong />
 
 ## Install
 
 ```sh
-bun add react-glyphline
+bun add glyphline
 # for PDF pages
 bun add pdfjs-dist
 ```
 
-`react-glyphline` depends on `glyphline` (the core) and has `react` as a peer. Import the stylesheet once, from the core:
+The React adapter ships inside `glyphline` as `glyphline/react`; React is an optional peer, so Svelte apps never install it. Import the stylesheet once:
 
 ```ts
 import "glyphline/style.css";
@@ -24,7 +24,7 @@ import "glyphline/style.css";
 ## HTML in five lines
 
 ```tsx
-import { GlyphOverlay, useDomSource } from "react-glyphline";
+import { GlyphOverlay, useDomSource } from "glyphline/react";
 import "glyphline/style.css";
 
 export function Article({ word, sentence }: { word: number; sentence: number }) {

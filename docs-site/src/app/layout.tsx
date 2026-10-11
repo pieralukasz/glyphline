@@ -1,17 +1,24 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Figtree, Fragment_Mono, Newsreader } from "next/font/google";
 import { Provider } from "@/components/provider";
 import { appName, siteUrl as productionUrl, tagline } from "@/lib/shared";
 import "./global.css";
 
-const sans = Geist({
+const sans = Figtree({
   subsets: ["latin", "latin-ext"],
-  variable: "--font-geist",
+  variable: "--font-gl-sans",
 });
 
-const mono = Geist_Mono({
+const serif = Newsreader({
   subsets: ["latin", "latin-ext"],
-  variable: "--font-geist-mono",
+  variable: "--font-gl-serif",
+  style: ["normal", "italic"],
+});
+
+const mono = Fragment_Mono({
+  subsets: ["latin", "latin-ext"],
+  weight: "400",
+  variable: "--font-gl-mono",
 });
 
 /** DOCS_SITE_URL wins, then the Vercel production domain, then the public URL. */
@@ -35,7 +42,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${sans.variable} ${mono.variable}`}
+      className={`${sans.variable} ${serif.variable} ${mono.variable}`}
       suppressHydrationWarning
     >
       <body className="flex flex-col min-h-screen">

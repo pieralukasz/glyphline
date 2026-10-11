@@ -10,7 +10,7 @@ import {
 } from "@/components/demo";
 import { authorUrl, repoUrl } from "@/lib/shared";
 
-const reactCode = `import { GlyphOverlay, useDomSource } from "react-glyphline";
+const reactCode = `import { GlyphOverlay, useDomSource } from "glyphline/react";
 import "glyphline/style.css";
 
 export function Article({ sentence, word }) {
@@ -24,7 +24,7 @@ export function Article({ sentence, word }) {
 }`;
 
 const svelteCode = `<script>
-  import { domText, GlyphOverlay } from "svelte-glyphline";
+  import { domText, GlyphOverlay } from "glyphline/svelte";
   import "glyphline/style.css";
 
   let { sentence, word } = $props();
@@ -48,7 +48,7 @@ hl.update({ sentence: 3, word: 41 }); // glides there`;
 export default function HomePage() {
   return (
     <main className="flex flex-col">
-      <section className="gl-dots border-b">
+      <section className="gl-ruled border-b">
         <div className="mx-auto grid w-full max-w-[1100px] gap-10 px-6 pt-12 pb-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:items-center">
           <div>
             <p className="gl-label font-medium text-fd-primary">
@@ -78,20 +78,15 @@ export default function HomePage() {
               >
                 GitHub
               </a>
-              <code className="rounded-lg border bg-fd-card px-3 py-2 font-mono text-sm">
-                bun add react-glyphline
-              </code>
-              <code className="rounded-lg border bg-fd-card px-3 py-2 font-mono text-sm">
-                bun add svelte-glyphline
+              <code className="rounded-full border bg-fd-card px-4 py-2.5 font-mono text-sm">
+                bun add glyphline
               </code>
             </div>
             <ul className="mt-8 grid gap-2 text-sm text-fd-muted-foreground sm:grid-cols-2">
-              <li>
-                ✦ Packages for React and Svelte 5, on a framework-free core
-              </li>
+              <li>✦ One package: core, React and Svelte 5 adapters</li>
               <li>✦ pdf.js pages and plain HTML, one API</li>
               <li>✦ Interruptible motion, reduced-motion aware</li>
-              <li>✦ No dependencies; pdf.js and React are optional peers</li>
+              <li>✦ No dependencies; React, Svelte and pdf.js are optional</li>
             </ul>
           </div>
           <ReadAlong autoPlay compact />

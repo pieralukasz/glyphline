@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { Mark, TextRange } from "glyphline";
-import { domText, GlyphOverlay } from "svelte-glyphline";
+import { domText, GlyphOverlay } from "glyphline/svelte";
 
 const text = domText();
 let word = $state(-1);

@@ -1,4 +1,4 @@
-// The Svelte demo on /docs/svelte: real Svelte 5 components from svelte-glyphline, built into
+// The Svelte demo on /docs/svelte: real Svelte 5 components from glyphline/svelte, built into
 // public/svelte-demo/ and mounted by the docs page. Run by the docs prebuild.
 import { fileURLToPath } from "node:url";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
@@ -22,8 +22,8 @@ export default defineConfig({
       },
       { find: /^glyphline$/, replacement: pkg("glyphline/src/index.ts") },
       {
-        find: /^svelte-glyphline$/,
-        replacement: pkg("svelte-glyphline/src/lib/index.ts"),
+        find: /^glyphline\/svelte$/,
+        replacement: pkg("glyphline/src/svelte/index.ts"),
       },
     ],
   },

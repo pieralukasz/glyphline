@@ -1,5 +1,5 @@
 "use client";
-import { GlyphOverlay, useDomSource } from "react-glyphline";
+import { GlyphOverlay, useDomSource } from "glyphline/react";
 import { Button, Icon, icons, Toolbar } from "./controls";
 import { useReader } from "./use-reader";
 

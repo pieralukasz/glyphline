@@ -1,5 +1,5 @@
 // Copied from docs-site/content/docs/react/index.mdx
-import { GlyphOverlay, useDomSource } from 'react-glyphline';
+import { GlyphOverlay, useDomSource } from 'glyphline/react';
 import 'glyphline/style.css';
 
 export function Article({ word, sentence }: { word: number; sentence: number }) {

@@ -8,31 +8,11 @@ description: Install glyphline, put an svg over your text and move the highlight
 
 ### Install
 
-<Tabs items={["React", "Svelte", "No framework"]}>
-<Tab value="React">
-
-```sh
-bun add react-glyphline
-```
-
-</Tab>
-<Tab value="Svelte">
-
-```sh
-bun add svelte-glyphline
-```
-
-</Tab>
-<Tab value="No framework">
-
 ```sh
 bun add glyphline
 ```
 
-</Tab>
-</Tabs>
-
-For PDF pages add `pdfjs-dist`. Each framework has its own section with complete examples: [React](/docs/react), [Svelte](/docs/svelte).
+For PDF pages add `pdfjs-dist`. The React and Svelte adapters are in the same package, `glyphline/react` and `glyphline/svelte`; each has its own section with complete examples: [React](/docs/react), [Svelte](/docs/svelte).
 
 </Step>
 <Step>
@@ -93,7 +73,7 @@ See [PDF pages](/docs/pdf) for rendering the canvas and the text layer.
 <Tab value="React">
 
 ```tsx
-import { GlyphOverlay, useDomSource } from "react-glyphline";
+import { GlyphOverlay, useDomSource } from "glyphline/react";
 import "glyphline/style.css";
 
 const [ref, source] = useDomSource<HTMLElement>();
@@ -109,7 +89,7 @@ const [ref, source] = useDomSource<HTMLElement>();
 
 ```svelte
 <script lang="ts">
-  import { domText, GlyphOverlay } from "svelte-glyphline";
+  import { domText, GlyphOverlay } from "glyphline/svelte";
   import "glyphline/style.css";
 
   const text = domText();

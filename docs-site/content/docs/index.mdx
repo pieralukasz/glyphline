@@ -20,22 +20,22 @@ Everything is an `<svg>` overlay with `pointer-events: none`, so the text undern
 
 A highlight is only as good as its boxes. For HTML, glyphline asks the browser (`Range.getClientRects`). For PDF pages it walks the page's glyph stream with the embedded fonts' advance widths, the same way pdf.js paints the canvas, and falls back per text item to the pdf.js text layer where it cannot. The [accuracy page](/docs/accuracy) shows the difference and how it was measured.
 
-## Packages
+## One package
 
-| Package | For | |
-| --- | --- | --- |
-| [`react-glyphline`](/docs/react) | React 18 and 19 | `<GlyphOverlay>`, `useDomSource`, `useAsyncSource`, `useHighlighter` |
-| [`svelte-glyphline`](/docs/svelte) | Svelte 5 | `<GlyphOverlay>`, `domText`, `asyncText`, `use:highlight` |
-| `glyphline` | everything else | the framework-free core both are built on |
-
-```ts
-import { createHighlighter } from "glyphline"; // core: overlay, motion, shapes
-import { pdfSource } from "glyphline/pdf"; // text + geometry of a pdf.js page
-import { domSource } from "glyphline/dom"; // text + geometry of HTML
-import "glyphline/style.css"; // default colours
+```sh
+bun add glyphline
 ```
 
-The framework packages install the core with them. The core has no dependencies; `pdfjs-dist` is an optional peer, needed only by `glyphline/pdf`.
+| Import | What |
+| --- | --- |
+| `glyphline` | the core: `createHighlighter`, motion, shapes, `wordAtPoint` |
+| `glyphline/pdf` | text and geometry of a pdf.js page |
+| `glyphline/dom` | text and geometry of HTML |
+| [`glyphline/react`](/docs/react) | `<GlyphOverlay>`, `useDomSource`, `useAsyncSource`, `useHighlighter` |
+| [`glyphline/svelte`](/docs/svelte) | `<GlyphOverlay>`, `domText`, `asyncText`, `use:highlight` |
+| `glyphline/style.css` | default colours |
+
+The core has no dependencies. `react`, `svelte` and `pdfjs-dist` are optional peers: install only what your app uses.
 
 ## Browser support
 

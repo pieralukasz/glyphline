@@ -19,24 +19,20 @@ Docs and live demos: https://glyphline.lucaspiera.com
   moves between lines with the same liquid motion, and pops in and out. The sentence outline morphs
   line by line. Interrupting mid-flight continues from what is on screen.
   `prefers-reduced-motion` turns it into jumps.
-- **React and Svelte packages** on a framework-free core that works anywhere.
+- **One package for React, Svelte 5 and plain TypeScript**: `glyphline/react` and `glyphline/svelte` on a framework-free core.
 
-## Packages
+## Install
 
-| Package | For | Docs |
-| --- | --- | --- |
-| [`react-glyphline`](packages/react-glyphline) | React 18 and 19 | https://glyphline.lucaspiera.com/docs/react |
-| [`svelte-glyphline`](packages/svelte-glyphline) | Svelte 5 | https://glyphline.lucaspiera.com/docs/svelte |
-| [`glyphline`](packages/glyphline) | the framework-free core | https://glyphline.lucaspiera.com/docs/api |
+```sh
+bun add glyphline
+```
+
+One package: the core plus React and Svelte 5 adapters as subpath imports. `react`, `svelte` and `pdfjs-dist` are optional peers, so you install only what your app uses.
 
 ### React
 
-```sh
-bun add react-glyphline
-```
-
 ```tsx
-import { GlyphOverlay, useDomSource } from 'react-glyphline';
+import { GlyphOverlay, useDomSource } from 'glyphline/react';
 import 'glyphline/style.css';
 
 const [ref, source] = useDomSource<HTMLElement>();
@@ -49,13 +45,9 @@ const [ref, source] = useDomSource<HTMLElement>();
 
 ### Svelte 5
 
-```sh
-bun add svelte-glyphline
-```
-
 ```svelte
 <script lang="ts">
-	import { domText, GlyphOverlay } from 'svelte-glyphline';
+	import { domText, GlyphOverlay } from 'glyphline/svelte';
 	import 'glyphline/style.css';
 
 	const text = domText();
@@ -80,22 +72,24 @@ const hl = createHighlighter(svg, source); // svg covers the page; viewBox is in
 hl.update({ sentence: 3, word: 41 });
 ```
 
-| Core import | What |
+| Import | What |
 | --- | --- |
 | `glyphline` | `createHighlighter`, the motion interpolators, outline geometry, `segment`, `wordAtPoint` |
 | `glyphline/pdf` | `pdfSource` for a pdf.js page, glyph walk, per-method geometry |
 | `glyphline/dom` | `domSource`, `watchDomSource` for HTML text |
+| `glyphline/react` | `GlyphOverlay`, `useHighlighter`, `useDomSource`, `useAsyncSource` |
+| `glyphline/svelte` | `GlyphOverlay` (component), `domText`, `asyncText`, `highlight` action, `glyphline` attachment |
 | `glyphline/style.css` | default colours as CSS custom properties |
 | `glyphline/pdf.css` | the minimum CSS for the native pdf.js text layer |
 
 ## Development
 
-A bun workspace: `packages/glyphline` (core), `packages/react-glyphline`, `packages/svelte-glyphline`, and `docs-site` (Fumadocs).
+A bun workspace: `packages/glyphline` (the published package: `src/core`, `src/pdf`, `src/dom`, `src/react`, `src/svelte`) and `docs-site` (Fumadocs).
 
 ```sh
 bun install
-bun run build                        # core first, then the framework packages
-bun run typecheck && bun run test    # every package; Node + Chromium (Vitest browser mode)
+bun run build                        # tsdown + svelte-package
+bun run typecheck && bun run test    # tsc + svelte-check; Node + Chromium (core, React, Svelte)
 bun run check:package && bun run lint
 cd docs-site && bun install && bun run build
 ```

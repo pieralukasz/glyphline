@@ -1,7 +1,7 @@
 {
 	"name": "glyphline",
 	"version": "0.1.0",
-	"description": "Text highlights that sit on the glyphs: a sentence outline that morphs, a word cursor that glides, a drawn selection and marks. For pdf.js pages (positions from the embedded fonts) and HTML. Framework-free; see react-glyphline and svelte-glyphline.",
+	"description": "Text highlights that sit on the glyphs: a sentence outline that morphs, a word cursor that glides, a drawn selection and marks. For pdf.js pages (positions from the embedded fonts) and HTML. Framework-free core with React (glyphline/react) and Svelte 5 (glyphline/svelte) adapters.",
 	"keywords": [
 		"highlight",
 		"text-highlight",
@@ -15,7 +15,11 @@
 		"selection",
 		"annotation",
 		"svg",
-		"animation"
+		"animation",
+		"react",
+		"react-component",
+		"svelte",
+		"sveltekit"
 	],
 	"homepage": "https://glyphline.lucaspiera.com",
 	"bugs": "https://github.com/pieralukasz/glyphline/issues",
@@ -43,15 +47,24 @@
 			"types": "./dist/dom/index.d.ts",
 			"default": "./dist/dom/index.js"
 		},
+		"./react": {
+			"types": "./dist/react/index.d.ts",
+			"default": "./dist/react/index.js"
+		},
+		"./svelte": {
+			"types": "./dist/svelte/index.d.ts",
+			"svelte": "./dist/svelte/index.js",
+			"default": "./dist/svelte/index.js"
+		},
 		"./style.css": {
 			"types": "./dist/css.d.ts",
 			"default": "./dist/style.css"
 		},
-		"./package.json": "./package.json",
 		"./pdf.css": {
 			"types": "./dist/css.d.ts",
 			"default": "./dist/pdf.css"
-		}
+		},
+		"./package.json": "./package.json"
 	},
 	"main": "./dist/index.js",
 	"module": "./dist/index.js",
@@ -64,22 +77,38 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build": "tsdown && cp src/style.css src/pdf.css src/css.d.ts dist/",
+		"build": "tsdown && svelte-package -i src/svelte -o dist/svelte && cp src/style.css src/pdf.css src/css.d.ts dist/",
 		"dev": "tsdown --watch",
-		"typecheck": "tsc --noEmit",
+		"typecheck": "tsc --noEmit && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings",
 		"test": "vitest run",
 		"check:package": "publint",
 		"prepublishOnly": "bun run typecheck && bun run test && bun run build"
 	},
 	"peerDependencies": {
-		"pdfjs-dist": ">=4"
+		"pdfjs-dist": ">=4",
+		"react": ">=18",
+		"svelte": "^5.29.0"
 	},
 	"peerDependenciesMeta": {
 		"pdfjs-dist": {
 			"optional": true
+		},
+		"react": {
+			"optional": true
+		},
+		"svelte": {
+			"optional": true
 		}
 	},
 	"devDependencies": {
-		"pdfjs-dist": "^6.4.299"
+		"@sveltejs/package": "^3.0.0",
+		"@sveltejs/vite-plugin-svelte": "^7.2.0",
+		"@types/react": "^19",
+		"@types/react-dom": "^19",
+		"pdfjs-dist": "^6.4.299",
+		"react": "^19.3.0",
+		"react-dom": "^19",
+		"svelte": "^5.57.1",
+		"svelte-check": "^4.6.0"
 	}
 }

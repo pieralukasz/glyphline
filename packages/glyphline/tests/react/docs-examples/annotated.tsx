@@ -1,7 +1,7 @@
 // Copied from docs-site/content/docs/react/selection.mdx
 import type { Mark, TextRange } from 'glyphline';
+import { GlyphOverlay, useDomSource } from 'glyphline/react';
 import { useState } from 'react';
-import { GlyphOverlay, useDomSource } from 'react-glyphline';
 
 export function Annotated() {
 	const [ref, source] = useDomSource<HTMLDivElement>();

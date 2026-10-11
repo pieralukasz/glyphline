@@ -1,15 +1,23 @@
 @import "tailwindcss";
-@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/solar.css";
 @import "fumadocs-ui/css/preset.css";
-@import "fumadocs-ui/css/generated/glass.css";
 @import "../../../packages/glyphline/src/style.css";
 @import "./demo.css";
 
-/* Geist for text, Geist Mono for code and small labels (set on <html> in layout.tsx). */
+/* Figtree for text, Newsreader for headings (a reading library reads like print), Fragment Mono for code. */
 @theme inline {
-  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-gl-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-gl-serif), Georgia, serif;
   --font-mono:
-    var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+    var(--font-gl-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+h1,
+h2,
+.prose :is(h2, h3) {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 /* Amber ink, the colour of the word cursor. */
@@ -35,17 +43,21 @@ html > body[data-scroll-locked] {
   --removed-body-scroll-bar-size: 0px !important;
 }
 
-/* Home hero: a faint dot grid that fades out towards the content below. */
-.gl-dots {
+/* Home hero: ruled paper with a margin line, fading out towards the content below. */
+.gl-ruled {
   background-image:
-    linear-gradient(to bottom, transparent 40%, var(--color-fd-background)),
-    radial-gradient(
-      color-mix(in oklab, var(--color-fd-foreground) 16%, transparent) 1px,
-      transparent 1.5px
+    linear-gradient(to bottom, transparent 55%, var(--color-fd-background)),
+    linear-gradient(
+      to right,
+      transparent 47px,
+      color-mix(in oklab, oklch(0.65 0.18 25) 35%, transparent) 47px 48px,
+      transparent 48px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 31px,
+      color-mix(in oklab, var(--color-fd-primary) 16%, transparent) 31px 32px
     );
-  background-size:
-    100% 100%,
-    20px 20px;
 }
 
 /* Small uppercase labels: section eyebrows on the home page. */

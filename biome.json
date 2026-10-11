@@ -13,7 +13,7 @@
 			"!**/tests/fixtures",
 			"!!**/docs-site",
 			"!!**/.svelte-kit",
-			"!**/tests/docs-examples"
+			"!**/docs-examples"
 		]
 	},
 	"formatter": {
@@ -48,7 +48,9 @@
 	},
 	"overrides": [
 		{
-			"includes": ["**/*.svelte"],
+			"includes": [
+				"**/*.svelte"
+			],
 			"linter": {
 				"rules": {
 					"style": {

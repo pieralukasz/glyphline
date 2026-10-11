@@ -1,8 +1,8 @@
 <!-- Copied from docs-site/content/docs/svelte/pdf.mdx; svelte-check keeps the docs example compiling. -->
 <script lang="ts">
 import { type PdfTextSource, pdfSource } from 'glyphline/pdf';
+import { asyncText, GlyphOverlay } from 'glyphline/svelte';
 import type { PDFPageProxy } from 'pdfjs-dist';
-import { asyncText, GlyphOverlay } from 'svelte-glyphline';
 import 'glyphline/style.css';
 import 'glyphline/pdf.css';
 

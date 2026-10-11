@@ -27,7 +27,7 @@ const config = {
       glyphline: "../packages/glyphline/src/index.ts",
       "glyphline/dom": "../packages/glyphline/src/dom/index.ts",
       "glyphline/pdf": "../packages/glyphline/src/pdf/index.ts",
-      "react-glyphline": "../packages/react-glyphline/src/index.ts",
+      "glyphline/react": "../packages/glyphline/src/react/index.ts",
     },
   },
 };

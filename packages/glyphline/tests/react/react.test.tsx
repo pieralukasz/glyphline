@@ -3,7 +3,7 @@ import { domSource } from 'glyphline/dom';
 import { act, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { afterEach, describe, expect, it } from 'vitest';
-import { GlyphOverlay, useAsyncSource, useDomSource } from '../src/index.ts';
+import { GlyphOverlay, useAsyncSource, useDomSource } from '../../src/react/index.ts';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
