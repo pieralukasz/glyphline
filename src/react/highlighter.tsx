@@ -81,19 +81,34 @@ export type GlyphOverlayProps = HighlightState & {
 	options?: HighlighterOptions;
 	className?: string;
 	style?: CSSProperties;
+	/**
+	 * Force the light or dark colours of `glyphline/style.css`. A PDF page stays white in a dark
+	 * site, so its overlay wants "light".
+	 */
+	theme?: 'light' | 'dark';
 };
 
 /**
  * An `<svg>` overlay with the highlights. Place it inside a positioned element that wraps the
  * text; the default `gl-overlay` class from `glyphline/style.css` stretches it over its parent.
  */
-export function GlyphOverlay({ source, options, className, style, ...state }: GlyphOverlayProps) {
+export function GlyphOverlay({
+	source,
+	options,
+	className,
+	style,
+	theme,
+	...state
+}: GlyphOverlayProps) {
 	const ref = useHighlighter(source, state, options);
+	// keep the overlay class the highlighter adds: React owns the class attribute
+	const base = `${options?.classPrefix ?? 'gl'}-overlay`;
 	return (
 		<svg
 			ref={ref}
-			className={className}
+			className={className ? `${base} ${className}` : base}
 			style={style}
+			data-gl-theme={theme}
 			preserveAspectRatio="none"
 			aria-hidden="true"
 		/>

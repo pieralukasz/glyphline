@@ -1,1 +1,4 @@
-export { cn } from "cn";
+/** Join class names, skipping falsy ones. */
+export function cn(...parts: (string | false | null | undefined)[]) {
+  return parts.filter(Boolean).join(" ");
+}

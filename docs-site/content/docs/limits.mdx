@@ -1,0 +1,14 @@
+---
+title: Limits
+description: What glyphline does not do yet, and where its boxes are less precise.
+---
+
+- **Type3 fonts and text drawn as paths** have no advance widths. Those items fall back to the text layer or the items method; scans without an OCR layer have no text at all.
+- **Vertical writing** is placed per glyph, but sentence outlines assume horizontal lines: a vertical sentence becomes one shape per column.
+- **Hyphenated line breaks** in PDFs are joined by a heuristic (letter, hyphen, line end, lowercase letter). A compound word that happens to break at its hyphen becomes two words.
+- **Sentences** come from `Intl.Segmenter` plus an abbreviation list (e.g., et al., Fig.) and layout breaks in PDFs (font size changes, block gaps, list markers, table cells). An unusual abbreviation can still split a sentence.
+- **Special tokens** split the way `Intl.Segmenter` splits them: `42 ± 3` is three words, CJK follows the segmenter's dictionary.
+- **Letter-spaced text** (tracked capitals in a heading) often comes out of pdf.js with a space between every letter, so each letter becomes a word.
+- **Drop caps** are usually a separate text item, often placed before the heading in the content stream, so the large initial and the rest of its word are two words.
+- **HTML that changes** needs a new source. Ranges are offsets into the text the source was built from.
+- **Right-to-left text** is positioned correctly; the cursor's stretch direction follows screen position, not reading order.

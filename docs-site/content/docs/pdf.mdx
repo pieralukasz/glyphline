@@ -1,0 +1,71 @@
+---
+title: PDF pages
+description: Render a pdf.js page with its text layer and put glyphline on top.
+---
+
+glyphline does not render PDFs. You render the page with pdf.js as usual; `pdfSource` reads the same page's text and glyph positions, and the highlighter draws in page units over it.
+
+## Layers
+
+From the bottom: the canvas, the native text layer (transparent, selectable), the glyphline `<svg>`. The svg's `viewBox` is the page size at scale 1, so a zoom is one CSS size change and the highlights never need recomputing.
+
+```html
+<div class="page" style="position: relative; --scale-factor: 1.5; --total-scale-factor: 1.5">
+  <canvas></canvas>
+  <div class="textLayer"></div>
+  <svg class="gl-overlay" preserveAspectRatio="none"></svg>
+</div>
+```
+
+`glyphline/pdf.css` has the minimum CSS the text layer needs to line up with the canvas, so you do not need all of `pdf_viewer.css`.
+
+## Full example
+
+```ts
+import { getDocument, GlobalWorkerOptions, OPS, TextLayer } from "pdfjs-dist";
+import { createHighlighter } from "glyphline";
+import { pdfSource } from "glyphline/pdf";
+import "glyphline/style.css";
+import "glyphline/pdf.css";
+
+GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+
+const doc = await getDocument({ url: "/paper.pdf", fontExtraProperties: true }).promise;
+const page = await doc.getPage(1);
+const scale = 1.5;
+const viewport = page.getViewport({ scale });
+
+// 1. canvas
+const canvas = el.querySelector("canvas")!;
+canvas.width = viewport.width * devicePixelRatio;
+canvas.height = viewport.height * devicePixelRatio;
+canvas.style.width = `${viewport.width}px`;
+const ctx = canvas.getContext("2d")!;
+ctx.scale(devicePixelRatio, devicePixelRatio);
+await page.render({ canvas, canvasContext: ctx, viewport }).promise;
+
+// 2. text layer (selectable text)
+const layerEl = el.querySelector(".textLayer")!;
+const layer = new TextLayer({ textContentSource: await page.getTextContent(), container: layerEl, viewport });
+await layer.render();
+
+// 3. glyphline
+const base = await pdfSource(page, { OPS });
+const source = base.withTextLayer(layer.textDivs, layerEl, scale);
+const hl = createHighlighter(el.querySelector("svg")!, source, { trackSelection: true });
+hl.update({ sentence: 0, word: 0 });
+```
+
+`withTextLayer` is optional. It adds the text layer as the first fallback for text items the glyph walk cannot place (still better than splitting an item evenly), and it makes `rangeFromSelection` work, since the selection happens in the text layer.
+
+## `fontExtraProperties`
+
+Pass `fontExtraProperties: true` to `getDocument`. Without it pdf.js drops the font ascent, descent and matrix after loading, the glyph walk has nothing to measure with, and every word falls back to the text items method. Words still get boxes, just less precise ones.
+
+## Many pages
+
+Make one source per page and one overlay per page. Indices are page-local: `source.words[i]` is the i-th word of that page. To read across pages, keep a page number with your cursor and pass `null` to the pages that are not current.
+
+## Zoom and rotation
+
+Boxes are in page units at scale 1, after the page's `/Rotate` and CropBox, so the same source serves every zoom. Re-render the canvas and call `layer.update({ viewport })` as pdf.js documents; the overlay scales with its element.

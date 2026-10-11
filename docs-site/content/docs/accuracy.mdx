@@ -1,0 +1,31 @@
+---
+title: Accuracy
+description: Why word boxes from the pdf.js text layer drift, and how glyphline places them on the glyphs.
+---
+
+<MethodCompare />
+
+## Four ways to find a word on a PDF page
+
+| | Source | Exact where | Drifts where |
+| --- | --- | --- | --- |
+| **M1 Text items** | `getTextContent()` item transform and width, characters split evenly | item edges | inside multi-word items; poor where an item is a whole line |
+| **M2 Text layer** | `Range.getClientRects()` on the pdf.js text layer | span edges | inside a span: a substitute font stretched to the span width |
+| **M3 Glyphs** | the page operator list, walked with pdf.js's text state machine and the embedded fonts' advance widths | every glyph | text it cannot place has no box |
+| **Drawn** | M3 per text item; an item M3 cannot place fully takes M2, then M1, never mixed inside an item | as M3 | as the fallback, only where used |
+
+The glyph walk follows the state pdf.js paints with: the whole state saved by `q`/`Q` and form XObjects, the font from `Tf` or an ExtGState, `Tm`, `Td`, `TD`, `Tc`, `Tw`, `Tz`, `Ts`, `TJ` kerning, `cm`, negative font sizes and vertical fonts. Then it aligns the glyph stream with the text items, resynchronising on each item's origin.
+
+## Measured, not eyeballed
+
+The repository ships a 19-page stress PDF with the true box of every word (76 cases, 5 325 words: narrow and wide glyphs, spacing operators, mixed fonts, ligatures, Hebrew, Arabic, CJK, rotation, `/Rotate`, CropBox, OCR layers, textbook layouts). `bun run test` measures every page in Node and fails when one gets worse.
+
+| Across the 19 pages | Drawn (M3 + fallback) | M1 text items |
+| --- | --- | --- |
+| Median horizontal edge error per page | 0.001 to 0.003 px | 1.5 to 6.6 px |
+| p90 edge error, max(dx, dy), per page | 1.3 to 4.9 px | 4.8 to 22 px |
+| Words with a box | 90 to 100 % | |
+
+The vertical part of the edge error has a known cause: pdf.js takes the ascent from the embedded font, the ground truth generator took it from reportlab's metrics tables, so every top edge sits about 17 % of the box height higher while the bottom edge matches. That is why the horizontal median is reported on its own. In Node there is no text layer, so the drawn method falls back to M1 there; in the browser it falls back to M2.
+
+The benchmark is fail-closed: every method is judged on the same word pairs, a word without a box is a miss (IoU 0), and coverage is reported next to every number. "The glyph walk is best" is a claim about this document and the papers Folio was tested on, not about every PDF; see [limits](/docs/limits).

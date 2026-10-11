@@ -1,0 +1,124 @@
+---
+title: Getting started
+description: Install glyphline, put an svg over your text and move the highlights.
+---
+
+<Steps>
+<Step>
+
+### Install
+
+```sh
+bun add glyphline
+# for PDF pages
+bun add pdfjs-dist
+```
+
+</Step>
+<Step>
+
+### Put an overlay over the text
+
+The overlay is an `<svg>` inside a positioned element that wraps the text. The `gl-overlay` class from `glyphline/style.css` stretches it over its parent and sets the colours.
+
+```html
+<div style="position: relative">
+  <article id="text">…</article>
+  <svg class="gl-overlay"></svg>
+</div>
+```
+
+For a PDF page, the wrapper is the page element that holds the canvas and the text layer.
+
+</Step>
+<Step>
+
+### Build a text source
+
+A source is the text, its words and sentences, and a way to measure any character range.
+
+<Tabs items={["HTML", "PDF"]}>
+<Tab value="HTML">
+
+```ts
+import { domSource } from "glyphline/dom";
+
+const source = domSource(document.getElementById("text")!);
+```
+
+</Tab>
+<Tab value="PDF">
+
+```ts
+import { getDocument, OPS } from "pdfjs-dist";
+import { pdfSource } from "glyphline/pdf";
+
+// fontExtraProperties keeps the font metrics the glyph walk reads
+const doc = await getDocument({ url, fontExtraProperties: true }).promise;
+const page = await doc.getPage(1);
+const source = await pdfSource(page, { OPS });
+```
+
+See [PDF pages](/docs/pdf) for rendering the canvas and the text layer.
+
+</Tab>
+</Tabs>
+
+</Step>
+<Step>
+
+### Highlight
+
+<Tabs items={["TypeScript", "React", "Svelte"]}>
+<Tab value="TypeScript">
+
+```ts
+import { createHighlighter } from "glyphline";
+import "glyphline/style.css";
+
+const hl = createHighlighter(svg, source);
+hl.update({ sentence: 0, word: 0 }); // indices into source.sentences / source.words
+hl.update({ word: 1 }); // the cursor glides there
+```
+
+</Tab>
+<Tab value="React">
+
+```tsx
+import { GlyphOverlay } from "glyphline/react";
+import "glyphline/style.css";
+
+<div style={{ position: "relative" }}>
+  <article ref={setArticle}>…</article>
+  <GlyphOverlay source={source} sentence={sentence} word={word} />
+</div>;
+```
+
+</Tab>
+<Tab value="Svelte">
+
+```svelte
+<script>
+  import { highlight } from "glyphline/svelte";
+  import "glyphline/style.css";
+</script>
+
+<div style="position: relative">
+  <article bind:this={article}>…</article>
+  <svg class="gl-overlay" use:highlight={{ source, sentence, word }} />
+</div>
+```
+
+</Tab>
+</Tabs>
+
+A target can also be a character range, `{ start, end }`, for anything that is not a whole word or sentence.
+
+</Step>
+</Steps>
+
+## Next
+
+- Tune the motion and shapes in the [playground](/docs/playground).
+- Draw the reader's selection and keep it as marks: [Selection and marks](/docs/selection).
+- Drive the cursor from speech: [Read-aloud](/docs/read-aloud).

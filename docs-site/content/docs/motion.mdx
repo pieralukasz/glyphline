@@ -1,0 +1,41 @@
+---
+title: Motion
+description: How the word cursor and the sentence outline move, frame by frame.
+---
+
+Each highlight is a tween from what is on screen now to the new target. The interpolators are pure functions you can import and test (`interpolateWord`, `interpolateSentence`). Scrub through each kind of move:
+
+<MotionAnatomy />
+
+## Interruptions
+
+A new target while a move is running starts a new tween from the current frame, not from the old target. Fast reading never queues moves up; the cursor bends toward the latest word.
+
+## Defaults
+
+| | Duration | Easing |
+| --- | --- | --- |
+| Word cursor | 240 ms | ease-out cubic |
+| Sentence outline | 340 ms | ease-out cubic |
+| Selection | 120 ms | ease-out cubic |
+
+At 240 words per minute a word lasts 250 ms, so the cursor lands before the voice moves on. The outline is slower because it travels further and should draw the eye less.
+
+## Reduced motion
+
+With `prefers-reduced-motion: reduce` every highlight jumps. `respectReducedMotion: false` overrides it (for demos like this site's playground); `animate: false` turns motion off for everyone.
+
+## Without the highlighter
+
+The geometry and motion are exported on their own, for a canvas renderer or another framework's tweens:
+
+```ts
+import { easeOutCubic, interpolateWord, wordPath } from "glyphline";
+
+const tween = interpolateWord(current, { box: nextBox, o: 1 });
+// each frame:
+const f = tween(easeOutCubic(progress));
+path.setAttribute("d", f ? wordPath(f.box) : "");
+```
+
+The library started this way: Folio fed the same interpolators to Svelte's `Tween`.

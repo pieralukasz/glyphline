@@ -1,0 +1,96 @@
+---
+title: API
+description: createHighlighter, text sources, targets and the exported geometry.
+---
+
+## createHighlighter
+
+```ts
+function createHighlighter(svg: SVGSVGElement, source: TextSource, options?: HighlighterOptions): Highlighter;
+```
+
+Adds its paths to `svg`, sets its `viewBox` from the source and returns:
+
+<TypeTable
+  type={{
+    "update(state)": { type: "(state: HighlightState) => void", description: "Move the highlights. Keys you leave out keep their value." },
+    "setSource(source)": { type: "(source: TextSource) => void", description: "Swap the text (new page, edited content). Highlights jump." },
+    "refresh()": { type: "() => void", description: "Re-measure after a layout change the overlay did not see." },
+    "setOptions(options)": { type: "(options: HighlighterOptions) => void", description: "Replace the options. Redraws only when shapes or class names change." },
+    state: { type: "HighlightState", description: "The current targets." },
+    "destroy()": { type: "() => void", description: "Stop animations and listeners, remove the paths." },
+  }}
+/>
+
+### HighlightState
+
+<TypeTable
+  type={{
+    sentence: { type: "number | { start, end } | null", description: "Sentence index of the source, or a character range." },
+    word: { type: "number | { start, end } | null", description: "Word index of the source, or a character range." },
+    selection: { type: "number | { start, end } | null", description: "Drawn selection. Set by trackSelection when it is on." },
+    marks: { type: "Mark[]", description: "{ id, start, end, className? } ranges drawn under everything else." },
+  }}
+/>
+
+### HighlighterOptions
+
+<TypeTable
+  type={{
+    animate: { type: "boolean", default: "true", description: "Off: highlights jump." },
+    respectReducedMotion: { type: "boolean", default: "true", description: "Jump when prefers-reduced-motion is reduce." },
+    duration: { type: "{ word?, sentence?, selection? }", default: "240, 340, 120", description: "Milliseconds." },
+    easing: { type: "(t: number) => number", default: "easeOutCubic" },
+    sentenceShape: { type: "{ pad?, radius?, snap? }", default: "2, 5, 4", description: "Outline of sentences, selections and marks, in overlay units." },
+    wordShape: { type: "{ pad?, radius? }", default: "1.5, 3", description: "Rounded box of the cursor." },
+    classPrefix: { type: "string", default: '"gl"' },
+    trackSelection: { type: "boolean | { snapToWords?, onChange? }", default: "false", description: "Draw the user's selection inside this source." },
+  }}
+/>
+
+## TextSource
+
+Anything that can be highlighted. `domSource` and `pdfSource` return one; you can write your own (a canvas editor, a custom renderer).
+
+```ts
+interface TextSource {
+  text: string;
+  words: Word[]; // { index, start, end, text, sentence }
+  sentences: Sentence[]; // { index, start, end, text, firstWord, lastWord }
+  boxes(start: number, end: number, overlay: Element): Box[]; // one per line fragment
+  viewBox(overlay: Element): Box;
+  live?: boolean; // re-measure on overlay resize
+  rangeFromSelection?(selection: Selection | null): TextRange | null;
+}
+```
+
+`segment(text, { breakAt, locale })` gives you `words` and `sentences` for your own text.
+
+## domSource
+
+```ts
+function domSource(root: Element, options?: { locale?: string; skip?: string }): DomTextSource;
+```
+
+Adds `root`, `rangeFromSelection(selection)`, `charAtPoint(x, y)` and `toRange(start, end)`.
+
+## pdfSource
+
+```ts
+function pdfSource(page: PDFPageProxy, options: { OPS: Record<string, number>; locale?: string }): Promise<PdfTextSource>;
+```
+
+Adds `page`, `pageText`, `width` and `height` (the page at scale 1), `geometry` (per-character boxes and which method placed each item), `fallbackItems`, `methods` (each method's raw boxes), `withTextLayer(textDivs, container, scale)` and `rangeFromSelection(selection)`.
+
+## Helpers
+
+| Export | |
+| --- | --- |
+| `wordAtPoint(source, svg, x, y)` | word index under a viewport point, or -1 |
+| `toOverlay(svg, x, y)` | viewport point to overlay units |
+| `wordAt(words, charIndex)` | word index containing a character |
+| `snapToWords(source, range)` | grow a range to whole words |
+| `wordRange`, `sentenceRange` | index to `{ start, end }` |
+| `sentenceShape`, `shapePath`, `outlinePath`, `wordPath` | outline geometry |
+| `interpolateWord`, `interpolateSentence`, `easeOutCubic` | motion |
+| `walkGlyphs`, `geometryFromGlyphs`, `geometryFromItems`, `geometryFromTextLayer`, `withFallback` (from `glyphline/pdf`) | the PDF positioning methods on their own |

@@ -1,0 +1,56 @@
+---
+title: React and Svelte
+description: The React hook and component, and the Svelte action and attachment.
+---
+
+Both adapters are thin: they create one highlighter, pass prop changes to `update`, and destroy it on unmount.
+
+## React
+
+```tsx
+import { GlyphOverlay, useHighlighter } from "glyphline/react";
+```
+
+`<GlyphOverlay>` renders the svg:
+
+```tsx
+<GlyphOverlay
+  source={source} // null while loading: nothing is drawn
+  sentence={sentence}
+  word={word}
+  marks={marks}
+  options={{ trackSelection: { onChange } }}
+  theme="light" // force the light colours (a white PDF page in a dark app)
+  className="my-overlay"
+/>
+```
+
+`useHighlighter(source, state, options)` returns a ref for your own `<svg>`. An inline `options` object is fine: the highlighter only redraws when shapes or class names change, and callbacks are read when they fire.
+
+Build the source in an effect or a ref callback; it reads the DOM, so it cannot run during server rendering. Render the overlay from a client component.
+
+## Svelte
+
+```svelte
+<script lang="ts">
+  import { highlight } from "glyphline/svelte";
+  import { domSource, type DomTextSource } from "glyphline/dom";
+
+  let article: HTMLElement;
+  let source = $state<DomTextSource | null>(null);
+  $effect(() => {
+    source = domSource(article);
+  });
+</script>
+
+<div style="position: relative">
+  <article bind:this={article}>…</article>
+  <svg class="gl-overlay" use:highlight={{ source, sentence, word }} />
+</div>
+```
+
+`highlight` is a plain action, so it works in Svelte 4 and 5. In Svelte 5 you can also use the attachment: `<svg {@attach glyphline({ source, word })} />`.
+
+## Other frameworks
+
+Call `createHighlighter` when the svg mounts, `update` when your state changes and `destroy` on unmount. That is all the adapters do.

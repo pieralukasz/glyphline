@@ -1,0 +1,21 @@
+{
+  "title": "glyphline",
+  "pages": [
+    "index",
+    "getting-started",
+    "playground",
+    "---Guides---",
+    "pdf",
+    "html",
+    "selection",
+    "read-aloud",
+    "styling",
+    "---How it works---",
+    "motion",
+    "accuracy",
+    "---Reference---",
+    "api",
+    "adapters",
+    "limits"
+  ]
+}

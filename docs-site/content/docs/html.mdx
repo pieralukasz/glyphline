@@ -1,0 +1,43 @@
+---
+title: HTML text
+description: Highlight ordinary HTML with domSource; it follows reflow and inline markup.
+---
+
+<HtmlReadAlong />
+
+`domSource(root)` walks the text nodes under `root` and joins them into one string. Inline markup (`em`, `a`, `strong`, spans) is transparent; a block boundary (paragraph, heading, list item) ends a sentence even without punctuation, so a heading never runs into the paragraph after it.
+
+```ts
+import { domSource } from "glyphline/dom";
+
+const source = domSource(article, {
+  locale: "pl", // default: the nearest lang attribute, then "en"
+  skip: "pre, code, [data-glyphline-skip]", // default skips script, style, textarea…
+});
+```
+
+## Reflow
+
+HTML moves: a resize, a font load, an expanded section. An HTML source is `live`, so the highlighter watches the overlay with a `ResizeObserver` and redraws when its size changes. For changes that do not resize the overlay (a web font swapping in), call `hl.refresh()`.
+
+When the **content** changes, build a new source and pass it to `hl.setSource()`. Indices and ranges refer to the text the source was built from.
+
+## Clicking a word
+
+```ts
+import { wordAtPoint } from "glyphline";
+
+article.addEventListener("click", (e) => {
+  const word = wordAtPoint(source, svg, e.clientX, e.clientY);
+  if (word >= 0) hl.update({ word });
+});
+```
+
+`wordAtPoint` uses the highlighter's own boxes, so it works the same for PDF sources. An HTML source also has `charAtPoint(x, y)` for the caret position under a point.
+
+## Scrolling into view
+
+```ts
+const w = source.words[word];
+source.toRange(w.start, w.end)?.startContainer.parentElement?.scrollIntoView({ block: "nearest" });
+```

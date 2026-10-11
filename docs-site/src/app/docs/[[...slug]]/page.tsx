@@ -10,7 +10,12 @@ import { createRelativeLink } from "fumadocs-ui/mdx";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/components/mdx";
-import { authorUrl, getPageImageUrl, getPageMarkdownUrl, gitConfig } from "@/lib/shared";
+import {
+  authorUrl,
+  getPageImageUrl,
+  getPageMarkdownUrl,
+  gitConfig,
+} from "@/lib/shared";
 import { source } from "@/lib/source";
 
 export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
@@ -44,7 +49,10 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
       </DocsBody>
       <p className="mt-10 border-t pt-4 font-mono text-xs text-fd-muted-foreground">
         Made by{" "}
-        <a className="text-fd-foreground underline underline-offset-4" href={authorUrl}>
+        <a
+          className="text-fd-foreground underline underline-offset-4"
+          href={authorUrl}
+        >
           Lucas Piera
         </a>
       </p>

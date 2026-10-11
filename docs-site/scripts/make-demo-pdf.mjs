@@ -16,21 +16,25 @@ const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><style>
   @page { size: 420pt 560pt; margin: 34pt 32pt 38pt; }
   body { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 10.6pt; line-height: 1.42; color: #1d1b18; }
   header { border-bottom: 0.6pt solid #b9b2a6; margin-bottom: 12pt; padding-bottom: 7pt; }
-  .kicker { font: 600 7.5pt/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0.12em; text-transform: uppercase; color: #8a8174; }
+  /* no letter-spacing and no drop cap: pdf.js extracts both in ways glyphline cannot rejoin yet (see Limits) */
+  .kicker { font: 600 8pt/1 "Helvetica Neue", Arial, sans-serif; color: #8a8174; }
   h1 { font-size: 19pt; font-weight: 700; margin: 6pt 0 0; letter-spacing: -0.01em; }
   .cols { column-count: 2; column-gap: 18pt; text-align: justify; hyphens: auto; }
   p { margin: 0 0 6pt; text-indent: 1.1em; }
   p:first-child { text-indent: 0; }
-  p:first-child::first-letter { font-size: 2.6em; float: left; line-height: 0.9; padding: 2pt 3pt 0 0; font-weight: 700; }
 </style></head><body>
-<header><div class="kicker">Lewis Carroll · Alice’s Adventures in Wonderland · Chapter I</div><h1>Down the Rabbit-Hole</h1></header>
+<header><div class="kicker">Lewis Carroll, Alice’s Adventures in Wonderland. Chapter I</div><h1>Down the Rabbit-Hole</h1></header>
 <div class="cols">${paragraphs.map((p) => `<p>${p}</p>`).join("")}</div>
 </body></html>`;
 
 const browser = await chromium.launch();
 const page = await browser.newPage();
 await page.setContent(html, { waitUntil: "load" });
-const pdf = await page.pdf({ preferCSSPageSize: true, printBackground: true, pageRanges: "1" });
+const pdf = await page.pdf({
+  preferCSSPageSize: true,
+  printBackground: true,
+  pageRanges: "1",
+});
 await browser.close();
 writeFileSync("public/demo.pdf", pdf);
 console.log(`public/demo.pdf: ${pdf.length} bytes`);

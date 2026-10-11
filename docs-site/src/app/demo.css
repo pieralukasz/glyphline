@@ -1,0 +1,381 @@
+/* Live demos on the docs site. */
+
+.gl-hero-mark {
+  background: linear-gradient(
+    transparent 12%,
+    color-mix(
+        in oklch,
+        var(--gl-word-hero, oklch(0.88 0.15 85)) 80%,
+        transparent
+      )
+      12% 92%,
+    transparent 92%
+  );
+  border-radius: 0.2em;
+  padding: 0 0.12em;
+  box-decoration-break: clone;
+}
+.dark .gl-hero-mark {
+  --gl-word-hero: oklch(0.55 0.13 80);
+}
+
+.gl-press {
+  transition: transform 120ms ease-out;
+}
+.gl-press:active {
+  transform: scale(0.97);
+}
+
+.gl-demo {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.gl-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.gl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 2rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 999px;
+  background: var(--color-fd-card);
+  color: var(--color-fd-foreground);
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    background 120ms,
+    transform 120ms ease-out;
+}
+.gl-btn:hover:not(:disabled) {
+  background: var(--color-fd-accent);
+}
+.gl-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.gl-btn:disabled {
+  opacity: 0.5;
+}
+.gl-btn.is-primary,
+.gl-btn.is-primary:hover:not(:disabled) {
+  background: var(--color-fd-primary);
+  border-color: transparent;
+  color: var(--color-fd-primary-foreground);
+}
+.gl-btn.is-primary:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+.gl-btn:focus-visible,
+.gl-seg button:focus-visible {
+  outline: 2px solid var(--color-fd-ring);
+  outline-offset: 2px;
+}
+
+.gl-seg {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 999px;
+  background: var(--color-fd-muted);
+}
+.gl-seg button {
+  height: 1.75rem;
+  padding: 0 0.7rem;
+  border-radius: 999px;
+  color: var(--color-fd-muted-foreground);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.gl-seg button.is-active {
+  background: var(--color-fd-background);
+  color: var(--color-fd-foreground);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+}
+
+.gl-toggle,
+.gl-slider,
+.gl-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--color-fd-muted-foreground);
+}
+.gl-toggle input {
+  accent-color: var(--color-fd-primary);
+}
+.gl-slider input {
+  width: 7rem;
+  accent-color: var(--color-fd-primary);
+}
+.gl-slider output {
+  min-width: 4.5ch;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-fd-foreground);
+  font-variant-numeric: tabular-nums;
+}
+.gl-select select {
+  height: 1.9rem;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.5rem;
+  background: var(--color-fd-card);
+  color: var(--color-fd-foreground);
+  padding: 0 0.4rem;
+}
+
+.gl-status {
+  margin-left: auto;
+  color: var(--color-fd-muted-foreground);
+  font-size: 0.8125rem;
+  /* fixed width: a changing word must not reflow the toolbar */
+  min-width: 13rem;
+  text-align: right;
+}
+
+.gl-caption {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-fd-muted-foreground);
+}
+
+/* The PDF page: paper that stays white in dark mode, like a printed page. */
+.gl-paper {
+  border-radius: 0.75rem;
+  border: 1px solid var(--color-fd-border);
+  background: color-mix(in oklab, var(--color-fd-muted) 60%, transparent);
+  padding: clamp(0.5rem, 2vw, 1rem);
+}
+.gl-pdf-page {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  background: white;
+  border-radius: 2px;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.08),
+    0 8px 24px -12px rgb(0 0 0 / 0.25);
+  overflow: hidden;
+}
+.gl-pdf-page canvas {
+  position: absolute;
+  inset: 0;
+}
+.gl-pdf-page .textLayer ::selection {
+  background: oklch(0.82 0.1 250 / 0.45);
+}
+.gl-pdf-page.gl-native-selection-hidden .textLayer ::selection {
+  background: transparent;
+}
+.gl-pdf-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #6b6459;
+  font-size: 0.875rem;
+}
+
+/* HTML text for the HTML demos. */
+.gl-article-wrap {
+  position: relative;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.75rem;
+  background: var(--color-fd-card);
+  padding: 1.25rem 1.5rem;
+}
+.gl-article-resizable {
+  resize: horizontal;
+  overflow: hidden;
+  min-width: 260px;
+  max-width: 100%;
+}
+.gl-article {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+.gl-article h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.gl-article p {
+  margin: 0 0 0.75rem;
+}
+.gl-article ul {
+  margin: 0 0 0.75rem 1.25rem;
+  list-style: disc;
+}
+.gl-article > :last-child {
+  margin-bottom: 0;
+}
+
+/* Saved marks */
+.gl-mark-yellow {
+  fill: oklch(0.9 0.15 95 / 0.75);
+}
+.gl-mark-green {
+  fill: oklch(0.88 0.13 150 / 0.65);
+}
+.gl-mark-pink {
+  fill: oklch(0.86 0.1 350 / 0.7);
+}
+:root.dark .gl-overlay:not([data-gl-theme="light"]) .gl-mark-yellow {
+  fill: oklch(0.6 0.13 95 / 0.45);
+}
+:root.dark .gl-overlay:not([data-gl-theme="light"]) .gl-mark-green {
+  fill: oklch(0.6 0.12 150 / 0.45);
+}
+:root.dark .gl-overlay:not([data-gl-theme="light"]) .gl-mark-pink {
+  fill: oklch(0.6 0.12 350 / 0.45);
+}
+.gl-notes {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+}
+.gl-notes li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.5rem;
+}
+.gl-notes code {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--color-fd-muted-foreground);
+}
+.gl-notes button {
+  width: 1.5rem;
+  color: var(--color-fd-muted-foreground);
+}
+.gl-note-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.gl-swatch {
+  flex: none;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 3px;
+}
+.gl-swatch-yellow {
+  background: oklch(0.88 0.15 95);
+}
+.gl-swatch-green {
+  background: oklch(0.84 0.13 150);
+}
+.gl-swatch-pink {
+  background: oklch(0.82 0.1 350);
+}
+
+/* Playground */
+.gl-playground-grid {
+  display: grid;
+  gap: 1rem;
+}
+@media (min-width: 900px) {
+  .gl-playground-grid {
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    align-items: start;
+  }
+}
+.gl-panel {
+  display: grid;
+  gap: 0.7rem;
+  padding: 1rem;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.75rem;
+  background: var(--color-fd-card);
+  font-size: 0.875rem;
+}
+.gl-panel .gl-slider {
+  display: grid;
+  grid-template-columns: 5.25rem minmax(0, 1fr) 3.75rem;
+}
+.gl-panel .gl-slider output {
+  text-align: right;
+}
+.gl-panel .gl-slider input {
+  width: 100%;
+}
+.gl-options {
+  margin: 0;
+  overflow-x: auto;
+  padding: 0.6rem 0.7rem;
+  border-radius: 0.5rem;
+  background: var(--color-fd-muted);
+  font-size: 0.6875rem;
+  line-height: 1.45;
+  white-space: pre;
+}
+
+/* Motion anatomy */
+.gl-anatomy {
+  width: 100%;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.75rem;
+  background: var(--color-fd-card);
+}
+.gl-anatomy-word {
+  fill: color-mix(in oklab, var(--color-fd-foreground) 22%, transparent);
+}
+.gl-anatomy-ghost {
+  fill: none;
+  stroke: color-mix(in oklch, var(--color-fd-primary) 45%, transparent);
+  stroke-width: 0.8;
+}
+.gl-anatomy-from,
+.gl-anatomy-to {
+  fill: none;
+  stroke: var(--color-fd-muted-foreground);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.gl-anatomy-now {
+  fill: color-mix(in oklch, var(--color-fd-primary) 55%, transparent);
+}
+.gl-anatomy-now.is-sentence {
+  fill: color-mix(in oklch, var(--color-fd-primary) 30%, transparent);
+}
+
+/* Method comparison */
+.gl-zoom {
+  overflow: auto;
+  max-height: 32rem;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.75rem;
+  background: color-mix(in oklab, var(--color-fd-muted) 60%, transparent);
+  padding: 0.75rem;
+}
+.gl-zoom .gl-pdf-page[style] {
+  max-width: none;
+}
+.gl-method-boxes {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.gl-method-boxes rect {
+  fill: oklch(0.7 0.15 250 / 0.12);
+  stroke: oklch(0.55 0.2 260);
+  stroke-width: 0.35;
+}

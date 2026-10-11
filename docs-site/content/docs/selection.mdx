@@ -1,0 +1,53 @@
+---
+title: Selection and marks
+description: Draw the reader's selection as one shape, snap it to words and keep it as a mark.
+---
+
+<SelectionDemo />
+
+## Drawing the selection
+
+```ts
+const hl = createHighlighter(svg, source, {
+  trackSelection: {
+    snapToWords: true,
+    onChange: (range, text) => showToolbar(range, text),
+  },
+});
+```
+
+glyphline listens to `selectionchange`, converts the selection inside its source to a character range and draws it with the sentence outline. Selections elsewhere on the page are ignored. Hide the browser's own colour on the selectable element with the `gl-native-selection-hidden` class; the selection itself still works, so copy, the context menu and keyboard selection behave as usual.
+
+`snapToWords` changes what is drawn and reported, not the browser's selection: copy still copies what the browser selected.
+
+Without `trackSelection` you can draw any range yourself: `hl.update({ selection: { start, end } })`.
+
+## Keeping a mark
+
+A mark is a character range plus an id and an optional class:
+
+```ts
+const marks = [
+  { id: "n1", start: 120, end: 168, className: "note-yellow" },
+  { id: "n2", start: 402, end: 431, className: "note-green" },
+];
+hl.update({ marks });
+```
+
+```css
+.gl-mark.note-yellow {
+  fill: oklch(0.9 0.15 95 / 0.75);
+}
+```
+
+Each mark path has `data-id`. Store `start` and `end` with the document; they redraw at any zoom or width. For HTML that changes, store some surrounding text too and re-anchor it.
+
+## A toolbar over the selection
+
+`onChange` gives you the range; the selection's position on screen comes from the browser:
+
+```ts
+const rect = document.getSelection()?.getRangeAt(0).getBoundingClientRect();
+```
+
+Prevent `mousedown` on the toolbar buttons (`e.preventDefault()`) so pressing one does not clear the selection.

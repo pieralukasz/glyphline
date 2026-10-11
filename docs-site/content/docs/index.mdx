@@ -1,0 +1,38 @@
+---
+title: Introduction
+description: glyphline draws text highlights that sit on the glyphs, a sentence outline that morphs and a word cursor that glides, for pdf.js pages and HTML.
+---
+
+The page below is a PDF rendered by pdf.js. glyphline draws the yellow sentence outline and the amber word cursor over it. Press **Read** or click any word.
+
+<ReadAlong />
+
+## What it draws
+
+- **A sentence outline.** A range over several lines is one rounded shape, not a stack of rectangles. Line ends of justified text are snapped so the edge stays straight, and a range that crosses columns becomes one shape per column.
+- **A word cursor.** Along a line it stretches toward the next word and contracts onto it; to another line it travels with the same motion; from nothing it pops in. Interrupting mid-flight continues from what is on screen.
+- **The selection.** The reader's selection drawn as one shape that follows the glyphs, optionally snapped to whole words.
+- **Marks.** Static ranges (notes, search hits) with your own classes.
+
+Everything is an `<svg>` overlay with `pointer-events: none`, so the text underneath stays selectable and clickable.
+
+## Where positions come from
+
+A highlight is only as good as its boxes. For HTML, glyphline asks the browser (`Range.getClientRects`). For PDF pages it walks the page's glyph stream with the embedded fonts' advance widths, the same way pdf.js paints the canvas, and falls back per text item to the pdf.js text layer where it cannot. The [accuracy page](/docs/accuracy) shows the difference and how it was measured.
+
+## Packages
+
+```ts
+import { createHighlighter } from "glyphline"; // core: overlay, motion, shapes
+import { pdfSource } from "glyphline/pdf"; // text + geometry of a pdf.js page
+import { domSource } from "glyphline/dom"; // text + geometry of HTML
+import { GlyphOverlay, useHighlighter } from "glyphline/react";
+import { highlight } from "glyphline/svelte";
+import "glyphline/style.css"; // default colours
+```
+
+The core has no dependencies. `pdfjs-dist` and `react` are optional peer dependencies, needed only by the entry points that use them.
+
+## Browser support
+
+Any browser with `Intl.Segmenter` and `ResizeObserver`. The automated tests run in Chromium.

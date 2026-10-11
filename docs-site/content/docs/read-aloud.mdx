@@ -1,0 +1,34 @@
+---
+title: Read-aloud
+description: Drive the word cursor from speechSynthesis word boundaries, with a timer fallback.
+---
+
+The cursor moves when you call `update({ word })`. For text-to-speech, the voice reports where it is through `boundary` events with a `charIndex` into the text you gave it.
+
+```ts
+import { wordAt } from "glyphline";
+
+function speak(sentenceIndex: number) {
+  const s = source.sentences[sentenceIndex];
+  if (!s) return;
+  const u = new SpeechSynthesisUtterance(s.text);
+  u.onboundary = (e) => {
+    if (e.name !== "word") return;
+    const word = wordAt(source.words, s.start + e.charIndex);
+    if (word >= 0) hl.update({ sentence: sentenceIndex, word });
+  };
+  u.onend = () => speak(sentenceIndex + 1);
+  hl.update({ sentence: sentenceIndex, word: s.firstWord });
+  speechSynthesis.speak(u);
+}
+```
+
+Speak one sentence per utterance: the outline moves at the right moment, and long utterances do not hit the length limits some engines have.
+
+## Voices without boundaries
+
+Many voices report no word boundaries, or only the first. A reader should not freeze then. Keep a watchdog: if the next boundary is overdue (estimate a word's duration from its length and the rate), move the cursor on a timer, and hand control back to the voice when boundaries come again. Show the user which mode is active: a timed cursor is an estimate, not synchronisation.
+
+## Words the voice reads as one
+
+`segment` joins tokens a voice speaks as one word (`p.3`, `e.g.`, `x@y.com`) and keeps math symbols (`±`, `≤`) as words because voices read them. A hyphenated line break in a PDF (`dispro-` / `portionately`) is one word drawn as two boxes.
