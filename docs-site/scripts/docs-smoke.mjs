@@ -41,7 +41,13 @@ const fail = (msg) => {
 
 // RESOLVE=host:ip pins a hostname to an IP when the local DNS cache is stale for a new subdomain
 const browser = await chromium.launch(
-  process.env.RESOLVE ? { args: [`--host-resolver-rules=MAP ${process.env.RESOLVE.replace(":", " ")}`] } : {},
+  process.env.RESOLVE
+    ? {
+        args: [
+          `--host-resolver-rules=MAP ${process.env.RESOLVE.replace(":", " ")}`,
+        ],
+      }
+    : {},
 );
 for (const [label, viewport, scheme] of [
   ["desktop", { width: 1440, height: 900 }, "light"],
@@ -229,8 +235,12 @@ for (const [label, viewport, scheme] of [
     .click();
   await page.waitForTimeout(700);
   const sw1 = await sv.locator("svg.gl-overlay .gl-word").getAttribute("d");
-  await page.waitForTimeout(600);
-  const sw2 = await sv.locator("svg.gl-overlay .gl-word").getAttribute("d");
+  // the cursor rests on long words and sentence ends: poll for a change instead of one fixed gap
+  let sw2 = sw1;
+  for (let i = 0; i < 15 && sw2 === sw1; i++) {
+    await page.waitForTimeout(200);
+    sw2 = await sv.locator("svg.gl-overlay .gl-word").getAttribute("d");
+  }
   if (!sw1?.startsWith("M") || sw1 === sw2)
     fail(`${label} svelte demo cursor does not move`);
   await page
