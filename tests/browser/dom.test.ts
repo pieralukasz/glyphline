@@ -44,7 +44,7 @@ describe('domSource', () => {
 	});
 
 	it('returns one box per line, relative to the overlay', () => {
-		const { root, svg } = mount('<p>' + 'word '.repeat(60) + '</p>');
+		const { root, svg } = mount(`<p>${'word '.repeat(60)}</p>`);
 		const s = domSource(root);
 		const all = s.boxes(0, s.text.length, svg);
 		expect(all.length).toBeGreaterThan(3);
@@ -127,7 +127,7 @@ describe('createHighlighter on HTML', () => {
 	});
 
 	it('re-measures when the text reflows', async () => {
-		const { host, root, svg } = mount('<p>' + 'word '.repeat(40) + '</p>');
+		const { host, root, svg } = mount(`<p>${'word '.repeat(40)}</p>`);
 		const s = domSource(root);
 		const hl = createHighlighter(svg, s, { animate: false });
 		hl.update({ sentence: { start: 0, end: s.text.length } });
