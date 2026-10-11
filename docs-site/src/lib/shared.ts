@@ -21,7 +21,6 @@ export const gitConfig = {
 export const repoUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}`;
 export const authorUrl = "https://lucaspiera.com";
 export const siteUrl = "https://glyphline.lucaspiera.com";
-export const install = "bun add glyphline";
 
 const getContentUrl = createGetUrl(docsContentRoute);
 

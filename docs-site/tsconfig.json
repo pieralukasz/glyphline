@@ -18,11 +18,10 @@
       "@/*": ["./src/*"],
       "react": ["./node_modules/@types/react"],
       "react-dom": ["./node_modules/@types/react-dom"],
-      "glyphline": ["../src/index.ts"],
-      "glyphline/dom": ["../src/dom/index.ts"],
-      "glyphline/pdf": ["../src/pdf/index.ts"],
-      "glyphline/react": ["../src/react/index.ts"],
-      "glyphline/svelte": ["../src/svelte/index.ts"]
+      "glyphline": ["../packages/glyphline/src/index.ts"],
+      "glyphline/dom": ["../packages/glyphline/src/dom/index.ts"],
+      "glyphline/pdf": ["../packages/glyphline/src/pdf/index.ts"],
+      "react-glyphline": ["../packages/react-glyphline/src/index.ts"]
     },
     "plugins": [
       {
@@ -38,5 +37,5 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "svelte-demo"]
 }

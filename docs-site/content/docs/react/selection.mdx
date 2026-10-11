@@ -1,0 +1,51 @@
+---
+title: Selection and marks
+description: Draw the selection, snap it to words and keep it as marks, in React.
+---
+
+<SelectionDemo />
+
+```tsx
+import type { Mark, TextRange } from "glyphline";
+import { GlyphOverlay, useDomSource } from "react-glyphline";
+import { useState } from "react";
+
+export function Annotated() {
+  const [ref, source] = useDomSource<HTMLDivElement>();
+  const [selected, setSelected] = useState<{ range: TextRange; text: string } | null>(null);
+  const [marks, setMarks] = useState<Mark[]>([]);
+
+  return (
+    <>
+      <button
+        disabled={!selected}
+        onMouseDown={(e) => e.preventDefault()} // keep the selection alive
+        onClick={() => {
+          if (!selected) return;
+          setMarks((m) => [...m, { id: crypto.randomUUID(), ...selected.range, className: "note" }]);
+          document.getSelection()?.removeAllRanges();
+        }}
+      >
+        Highlight
+      </button>
+      <div style={{ position: "relative" }}>
+        <div ref={ref} className="gl-native-selection-hidden">…</div>
+        <GlyphOverlay
+          source={source}
+          marks={marks}
+          options={{
+            trackSelection: {
+              snapToWords: true,
+              onChange: (range, text) => setSelected(range ? { range, text } : null),
+            },
+          }}
+        />
+      </div>
+    </>
+  );
+}
+```
+
+An inline `options` object is fine: the overlay only redraws when shapes or class names change, and `onChange` is read when it fires, so the latest closure is used.
+
+Store `start`, `end` and `className` with the document and pass them back as `marks`. [Selection and marks](/docs/selection) covers the details shared with Svelte.

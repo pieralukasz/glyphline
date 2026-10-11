@@ -1,0 +1,49 @@
+---
+title: React API
+description: GlyphOverlay, useHighlighter, useDomSource and useAsyncSource.
+---
+
+```ts
+import { GlyphOverlay, useAsyncSource, useDomSource, useHighlighter } from "react-glyphline";
+```
+
+## `<GlyphOverlay>`
+
+Renders the `<svg>` overlay. Put it inside a positioned element that wraps the text.
+
+<TypeTable
+  type={{
+    source: { type: "TextSource | null", description: "The text. Nothing is drawn while it is null." },
+    sentence: { type: "number | { start, end } | null", description: "Sentence index or character range." },
+    word: { type: "number | { start, end } | null", description: "Word index or character range." },
+    marks: { type: "Mark[]", description: "Saved highlights: { id, start, end, className? }." },
+    selection: { type: "number | { start, end } | null", description: "Drawn selection, when you manage it yourself." },
+    options: { type: "HighlighterOptions", description: "Timing, shapes, trackSelection. See the core API." },
+    theme: { type: '"light" | "dark"', description: "Force the light or dark colours of glyphline/style.css." },
+    className: { type: "string", description: "Added next to gl-overlay." },
+    style: { type: "CSSProperties" },
+  }}
+/>
+
+## `useHighlighter(source, state, options?)`
+
+The hook behind `GlyphOverlay`. Returns a ref callback for your own `<svg>`:
+
+```tsx
+const ref = useHighlighter(source, { sentence, word }, { animate: true });
+return <svg ref={ref} className="gl-overlay my-overlay" preserveAspectRatio="none" />;
+```
+
+## `useDomSource<E>(options?)`
+
+`[ref, source]` for an element's HTML text. Rebuilt when the text changes (at most once per frame). `options` are those of [`domSource`](/docs/api#domsource), read when the element mounts.
+
+## `useAsyncSource(make, deps)`
+
+Runs `make` when `deps` change and returns its result once it resolves, dropping results that arrive after a newer call. Return `null` from `make` for "nothing yet". Meant for `pdfSource`:
+
+```ts
+const source = useAsyncSource(() => page && pdfSource(page, { OPS }), [page]);
+```
+
+Everything else (sources, `wordAtPoint`, shapes, motion) comes from the core: see [API](/docs/api).

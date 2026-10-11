@@ -11,7 +11,9 @@
 			"**",
 			"!!**/dist",
 			"!**/tests/fixtures",
-			"!!**/docs-site"
+			"!!**/docs-site",
+			"!!**/.svelte-kit",
+			"!**/tests/docs-examples"
 		]
 	},
 	"formatter": {
@@ -43,5 +45,25 @@
 				"organizeImports": "on"
 			}
 		}
-	}
+	},
+	"overrides": [
+		{
+			"includes": ["**/*.svelte"],
+			"linter": {
+				"rules": {
+					"style": {
+						"useConst": "off",
+						"useImportType": "off"
+					},
+					"correctness": {
+						"noUnusedVariables": "off",
+						"noUnusedImports": "off"
+					}
+				}
+			},
+			"formatter": {
+				"enabled": false
+			}
+		}
+	]
 }

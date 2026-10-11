@@ -1,0 +1,70 @@
+---
+title: PDF pages
+description: A pdf.js page component with the text layer and a glyphline overlay.
+---
+
+<ReadAlong />
+
+The page above is this component, with a timer moving `word`. It renders the canvas and the text layer with pdf.js, and `useAsyncSource` turns the page into a glyphline source.
+
+```tsx
+"use client";
+import type { PDFPageProxy } from "pdfjs-dist";
+import { OPS, TextLayer } from "pdfjs-dist";
+import { pdfSource, type PdfTextSource } from "glyphline/pdf";
+import { GlyphOverlay, useAsyncSource } from "react-glyphline";
+import { useEffect, useRef, useState } from "react";
+import "glyphline/style.css";
+import "glyphline/pdf.css";
+
+export function PdfPage({ page, scale, sentence, word }: {
+  page: PDFPageProxy; // from getDocument({ url, fontExtraProperties: true })
+  scale: number;
+  sentence: number;
+  word: number;
+}) {
+  const host = useRef<HTMLDivElement>(null);
+  const canvas = useRef<HTMLCanvasElement>(null);
+  const layer = useRef<HTMLDivElement>(null);
+  const base = useAsyncSource(() => pdfSource(page, { OPS }), [page]);
+  const [source, setSource] = useState<PdfTextSource | null>(null);
+
+  useEffect(() => {
+    if (!base || !canvas.current || !layer.current || !host.current) return;
+    const vp = page.getViewport({ scale });
+    const c = canvas.current;
+    const dpr = devicePixelRatio;
+    c.width = vp.width * dpr;
+    c.height = vp.height * dpr;
+    const ctx = c.getContext("2d")!;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    host.current.style.setProperty("--scale-factor", String(scale));
+    host.current.style.setProperty("--total-scale-factor", String(scale));
+    const render = page.render({ canvas: c, canvasContext: ctx, viewport: vp });
+    let tl: TextLayer | null = null;
+    render.promise.then(async () => {
+      layer.current!.replaceChildren();
+      tl = new TextLayer({ textContentSource: await page.getTextContent(), container: layer.current!, viewport: vp });
+      await tl.render();
+      setSource(base.withTextLayer(tl.textDivs, layer.current!, scale));
+    }, () => {});
+    return () => {
+      render.cancel();
+      tl?.cancel();
+    };
+  }, [page, base, scale]);
+
+  const vp = page.getViewport({ scale });
+  return (
+    <div ref={host} style={{ position: "relative", width: vp.width, height: vp.height }}>
+      <canvas ref={canvas} style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
+      <div ref={layer} className="textLayer" />
+      <GlyphOverlay source={source ?? base} sentence={sentence} word={word} theme="light" />
+    </div>
+  );
+}
+```
+
+Until the text layer is ready the overlay draws from `base` (glyphs, falling back to text items); after that it uses the text layer as the fallback too, and selections work.
+
+`theme="light"` keeps the light colours on the white page in a dark app. The [PDF guide](/docs/pdf) explains the layers, `fontExtraProperties` and zoom.

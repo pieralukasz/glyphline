@@ -21,8 +21,15 @@ const pages = [
   "/docs/motion",
   "/docs/accuracy",
   "/docs/api",
-  "/docs/adapters",
   "/docs/limits",
+  "/docs/react",
+  "/docs/react/pdf",
+  "/docs/react/selection",
+  "/docs/react/api",
+  "/docs/svelte",
+  "/docs/svelte/pdf",
+  "/docs/svelte/selection",
+  "/docs/svelte/api",
 ];
 
 const failures = [];
@@ -204,6 +211,54 @@ for (const [label, viewport, scheme] of [
     console.log(
       `ok ${label} playground next line ${y0.toFixed(1)} → ${y1.toFixed(1)}`,
     );
+
+  // the Svelte demo (a Svelte 5 app inside the React page): reads, selects, keeps a mark
+  await page.goto(`${BASE}/docs/svelte`, { waitUntil: "networkidle" });
+  const sv = page.locator("[data-svelte-demo]");
+  await sv
+    .waitFor({ timeout: 10_000 })
+    .catch(() => fail(`${label} svelte demo did not mount`));
+  await page
+    .locator("[data-svelte-host]")
+    .getByRole("button", { name: "Read" })
+    .click();
+  await page.waitForTimeout(700);
+  const sw1 = await sv.locator("svg.gl-overlay .gl-word").getAttribute("d");
+  await page.waitForTimeout(600);
+  const sw2 = await sv.locator("svg.gl-overlay .gl-word").getAttribute("d");
+  if (!sw1?.startsWith("M") || sw1 === sw2)
+    fail(`${label} svelte demo cursor does not move`);
+  await page
+    .locator("[data-svelte-host]")
+    .getByRole("button", { name: "Pause" })
+    .click();
+  await page.evaluate(() => {
+    const t = document.querySelector("[data-svelte-demo] p").firstChild;
+    const r = document.createRange();
+    r.setStart(t, 9);
+    r.setEnd(t, 22);
+    document.getSelection().removeAllRanges();
+    document.getSelection().addRange(r);
+  });
+  await page.waitForTimeout(250);
+  if (
+    !(
+      await sv.locator("svg.gl-overlay .gl-selection").getAttribute("d")
+    )?.startsWith("M")
+  )
+    fail(`${label} svelte selection not drawn`);
+  await page
+    .locator("[data-svelte-host]")
+    .getByRole("button", { name: "Highlight selection" })
+    .click();
+  await page.waitForTimeout(150);
+  if ((await sv.locator("svg.gl-overlay .gl-mark").count()) !== 1)
+    fail(`${label} svelte mark not kept`);
+  else console.log(`ok ${label} svelte demo: reads, selection → mark`);
+  if (SHOTS)
+    await page
+      .locator("[data-svelte-host]")
+      .screenshot({ path: `${SHOTS}/${label}_svelte-demo.png` });
 
   // search
   await page.goto(`${BASE}/api/search`);

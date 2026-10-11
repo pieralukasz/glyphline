@@ -22,16 +22,20 @@ A highlight is only as good as its boxes. For HTML, glyphline asks the browser (
 
 ## Packages
 
+| Package | For | |
+| --- | --- | --- |
+| [`react-glyphline`](/docs/react) | React 18 and 19 | `<GlyphOverlay>`, `useDomSource`, `useAsyncSource`, `useHighlighter` |
+| [`svelte-glyphline`](/docs/svelte) | Svelte 5 | `<GlyphOverlay>`, `domText`, `asyncText`, `use:highlight` |
+| `glyphline` | everything else | the framework-free core both are built on |
+
 ```ts
 import { createHighlighter } from "glyphline"; // core: overlay, motion, shapes
 import { pdfSource } from "glyphline/pdf"; // text + geometry of a pdf.js page
 import { domSource } from "glyphline/dom"; // text + geometry of HTML
-import { GlyphOverlay, useHighlighter } from "glyphline/react";
-import { highlight } from "glyphline/svelte";
 import "glyphline/style.css"; // default colours
 ```
 
-The core has no dependencies. `pdfjs-dist` and `react` are optional peer dependencies, needed only by the entry points that use them.
+The framework packages install the core with them. The core has no dependencies; `pdfjs-dist` is an optional peer, needed only by `glyphline/pdf`.
 
 ## Browser support
 

@@ -1,19 +1,12 @@
 "use client";
-import { type DomTextSource, domSource } from "glyphline/dom";
-import { GlyphOverlay } from "glyphline/react";
-import { useEffect, useRef, useState } from "react";
+import { GlyphOverlay, useDomSource } from "react-glyphline";
 import { Button, Icon, icons, Toolbar } from "./controls";
 import { useReader } from "./use-reader";
 
 /** The same cursor on ordinary HTML. Resize the window: the shapes follow the reflow. */
 export function HtmlReadAlong() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [source, setSource] = useState<DomTextSource | null>(null);
+  const [ref, source] = useDomSource<HTMLDivElement>();
   const reader = useReader(source, { wpm: 240 });
-
-  useEffect(() => {
-    if (ref.current) setSource(domSource(ref.current));
-  }, []);
 
   return (
     <div className="gl-demo">

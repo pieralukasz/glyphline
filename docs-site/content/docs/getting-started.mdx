@@ -8,11 +8,31 @@ description: Install glyphline, put an svg over your text and move the highlight
 
 ### Install
 
+<Tabs items={["React", "Svelte", "No framework"]}>
+<Tab value="React">
+
+```sh
+bun add react-glyphline
+```
+
+</Tab>
+<Tab value="Svelte">
+
+```sh
+bun add svelte-glyphline
+```
+
+</Tab>
+<Tab value="No framework">
+
 ```sh
 bun add glyphline
-# for PDF pages
-bun add pdfjs-dist
 ```
+
+</Tab>
+</Tabs>
+
+For PDF pages add `pdfjs-dist`. Each framework has its own section with complete examples: [React](/docs/react), [Svelte](/docs/svelte).
 
 </Step>
 <Step>
@@ -35,7 +55,7 @@ For a PDF page, the wrapper is the page element that holds the canvas and the te
 
 ### Build a text source
 
-A source is the text, its words and sentences, and a way to measure any character range.
+A source is the text, its words and sentences, and a way to measure any character range. In React and Svelte the hooks below (`useDomSource`, `domText`) do this step for you.
 
 <Tabs items={["HTML", "PDF"]}>
 <Tab value="HTML">
@@ -69,27 +89,17 @@ See [PDF pages](/docs/pdf) for rendering the canvas and the text layer.
 
 ### Highlight
 
-<Tabs items={["TypeScript", "React", "Svelte"]}>
-<Tab value="TypeScript">
-
-```ts
-import { createHighlighter } from "glyphline";
-import "glyphline/style.css";
-
-const hl = createHighlighter(svg, source);
-hl.update({ sentence: 0, word: 0 }); // indices into source.sentences / source.words
-hl.update({ word: 1 }); // the cursor glides there
-```
-
-</Tab>
+<Tabs items={["React", "Svelte", "No framework"]}>
 <Tab value="React">
 
 ```tsx
-import { GlyphOverlay } from "glyphline/react";
+import { GlyphOverlay, useDomSource } from "react-glyphline";
 import "glyphline/style.css";
 
+const [ref, source] = useDomSource<HTMLElement>();
+
 <div style={{ position: "relative" }}>
-  <article ref={setArticle}>…</article>
+  <article ref={ref}>…</article>
   <GlyphOverlay source={source} sentence={sentence} word={word} />
 </div>;
 ```
@@ -98,15 +108,29 @@ import "glyphline/style.css";
 <Tab value="Svelte">
 
 ```svelte
-<script>
-  import { highlight } from "glyphline/svelte";
+<script lang="ts">
+  import { domText, GlyphOverlay } from "svelte-glyphline";
   import "glyphline/style.css";
+
+  const text = domText();
 </script>
 
 <div style="position: relative">
-  <article bind:this={article}>…</article>
-  <svg class="gl-overlay" use:highlight={{ source, sentence, word }} />
+  <article {@attach text.attach}>…</article>
+  <GlyphOverlay source={text.source} {sentence} {word} />
 </div>
+```
+
+</Tab>
+<Tab value="No framework">
+
+```ts
+import { createHighlighter } from "glyphline";
+import "glyphline/style.css";
+
+const hl = createHighlighter(svg, source);
+hl.update({ sentence: 0, word: 0 }); // indices into source.sentences / source.words
+hl.update({ word: 1 }); // the cursor glides there
 ```
 
 </Tab>

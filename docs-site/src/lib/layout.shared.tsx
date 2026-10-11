@@ -37,7 +37,8 @@ export function baseOptions(): BaseLayoutProps {
     githubUrl: repoUrl,
     links: [
       { text: "Docs", url: "/docs" },
-      { text: "API", url: "/docs/api" },
+      { text: "React", url: "/docs/react" },
+      { text: "Svelte", url: "/docs/svelte" },
     ],
   };
 }

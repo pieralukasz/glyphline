@@ -1,0 +1,5 @@
+{
+  "title": "Svelte",
+  "pages": ["index", "pdf", "selection", "api"],
+  "defaultOpen": true
+}

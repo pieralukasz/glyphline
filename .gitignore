@@ -13,3 +13,4 @@ docs-site/out/
 docs-site/.source/
 docs-site/node_modules/
 tests/browser/__screenshots__/
+.vitest-attachments/

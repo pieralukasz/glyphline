@@ -1,0 +1,71 @@
+---
+title: React overview
+description: react-glyphline, the GlyphOverlay component and hooks for React 18 and 19.
+---
+
+Every demo on this site is built with `react-glyphline`.
+
+<HtmlReadAlong />
+
+## Install
+
+```sh
+bun add react-glyphline
+# for PDF pages
+bun add pdfjs-dist
+```
+
+`react-glyphline` depends on `glyphline` (the core) and has `react` as a peer. Import the stylesheet once, from the core:
+
+```ts
+import "glyphline/style.css";
+```
+
+## HTML in five lines
+
+```tsx
+import { GlyphOverlay, useDomSource } from "react-glyphline";
+import "glyphline/style.css";
+
+export function Article({ word, sentence }: { word: number; sentence: number }) {
+  const [ref, source] = useDomSource<HTMLElement>();
+  return (
+    <div style={{ position: "relative" }}>
+      <article ref={ref}>
+        <p>Alice was beginning to get very tired of sitting by her sister on the bank…</p>
+      </article>
+      <GlyphOverlay source={source} sentence={sentence} word={word} />
+    </div>
+  );
+}
+```
+
+`useDomSource` returns a ref and the source for that element. The source is rebuilt when the element's text changes (React rendered new children), so word and sentence indices always match what is on screen. It is `null` until the element mounts; `GlyphOverlay` draws nothing until then.
+
+## Clicking a word
+
+```tsx
+import { wordAtPoint } from "glyphline";
+
+<div
+  style={{ position: "relative" }}
+  onClick={(e) => {
+    const svg = e.currentTarget.querySelector("svg.gl-overlay");
+    if (!source || !svg || !document.getSelection()?.isCollapsed) return;
+    const w = wordAtPoint(source, svg, e.clientX, e.clientY);
+    if (w >= 0) setWord(w);
+  }}
+>
+```
+
+The `isCollapsed` check keeps a drag (a text selection) from also moving the cursor.
+
+## Next.js
+
+The package starts with `"use client"`, so `GlyphOverlay` and the hooks work from a server component tree. Sources read the DOM or pdf.js, so they are only made in the browser; both hooks handle that.
+
+## Next
+
+- [PDF pages in React](/docs/react/pdf)
+- [Selection and marks in React](/docs/react/selection)
+- [API reference](/docs/react/api)

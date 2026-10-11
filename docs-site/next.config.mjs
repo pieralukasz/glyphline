@@ -4,7 +4,7 @@ import { createMDX } from "fumadocs-mdx/next";
 
 const withMDX = createMDX();
 
-// The site builds the library from its source (../src), so the build root is one level up.
+// The site builds the packages from their source (../packages), so the build root is one level up.
 const repoRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 // Empty on Vercel. Set it to serve the static export from a sub-path.
@@ -24,13 +24,10 @@ const config = {
     // The site uses the library the way an app would, by package name, but builds it from the
     // source in this repository (tsconfig paths match).
     resolveAlias: {
-      glyphline: "../src/index.ts",
-      "glyphline/dom": "../src/dom/index.ts",
-      "glyphline/pdf": "../src/pdf/index.ts",
-      "glyphline/react": "../src/react/index.ts",
-      "glyphline/svelte": "../src/svelte/index.ts",
-      "glyphline/style.css": "../src/style.css",
-      "glyphline/pdf.css": "../src/pdf.css",
+      glyphline: "../packages/glyphline/src/index.ts",
+      "glyphline/dom": "../packages/glyphline/src/dom/index.ts",
+      "glyphline/pdf": "../packages/glyphline/src/pdf/index.ts",
+      "react-glyphline": "../packages/react-glyphline/src/index.ts",
     },
   },
 };

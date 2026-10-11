@@ -16,6 +16,8 @@ const source = domSource(article, {
 });
 ```
 
+In React, `useDomSource` builds the source and rebuilds it when the text changes; in Svelte, `domText` does the same.
+
 ## Reflow
 
 HTML moves: a resize, a font load, an expanded section. An HTML source is `live`, so the highlighter watches the overlay with a `ResizeObserver` and redraws when its size changes. For changes that do not resize the overlay (a web font swapping in), call `hl.refresh()`.

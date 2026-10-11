@@ -1,0 +1,80 @@
+---
+title: Svelte overview
+description: svelte-glyphline, the GlyphOverlay component, the highlight action and reactive sources for Svelte 5.
+---
+
+The demo below is a Svelte 5 app (mounted into this React page) using `svelte-glyphline`.
+
+<SvelteDemo />
+
+## Install
+
+```sh
+bun add svelte-glyphline
+# for PDF pages
+bun add pdfjs-dist
+```
+
+`svelte-glyphline` depends on `glyphline` (the core) and has `svelte@5` as a peer. Import the stylesheet once, from the core:
+
+```ts
+import "glyphline/style.css";
+```
+
+## HTML
+
+```svelte
+<script lang="ts">
+  import { domText, GlyphOverlay } from "svelte-glyphline";
+  import "glyphline/style.css";
+
+  let { word, sentence }: { word: number; sentence: number } = $props();
+  const text = domText();
+</script>
+
+<div style="position: relative">
+  <article {@attach text.attach}>
+    <p>Alice was beginning to get very tired of sitting by her sister on the bank…</p>
+  </article>
+  <GlyphOverlay source={text.source} {sentence} {word} />
+</div>
+```
+
+`domText()` gives you an attachment and a reactive `source`. The source is rebuilt when the element's text changes (an `{#each}` added a paragraph), so indices always match what is on screen. It is `null` until the element mounts.
+
+## Clicking a word
+
+```svelte
+<script lang="ts">
+  import { wordAtPoint } from "glyphline";
+
+  function onclick(e: MouseEvent) {
+    const svg = (e.currentTarget as HTMLElement).querySelector("svg.gl-overlay");
+    if (!text.source || !svg || !document.getSelection()?.isCollapsed) return;
+    const w = wordAtPoint(text.source, svg, e.clientX, e.clientY);
+    if (w >= 0) word = w;
+  }
+</script>
+
+<div style="position: relative" {onclick}>…</div>
+```
+
+## Component or action
+
+`<GlyphOverlay>` renders the svg for you and binds the highlighter (`bind:highlighter`) if you need `refresh()`. If you already have an `<svg>`, use the action instead; it also works in Svelte 4:
+
+```svelte
+<svg class="gl-overlay" use:highlight={{ source, sentence, word }}></svg>
+<!-- Svelte 5 attachment -->
+<svg class="gl-overlay" {@attach glyphline({ source, sentence, word })}></svg>
+```
+
+## SvelteKit
+
+Sources read the DOM or pdf.js, so they only exist in the browser. `domText` attaches on mount, and `asyncText` runs in an effect, so both are safe in components that also render on the server. Import pdf.js dynamically (`await import("pdfjs-dist")`) inside `onMount` or an effect: it touches `window` when it loads.
+
+## Next
+
+- [PDF pages in Svelte](/docs/svelte/pdf)
+- [Selection and marks in Svelte](/docs/svelte/selection)
+- [API reference](/docs/svelte/api)

@@ -1,4 +1,5 @@
 import { DynamicCodeBlock } from "fumadocs-ui/components/dynamic-codeblock";
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
@@ -7,16 +8,42 @@ import {
   ReadAlong,
   SelectionDemo,
 } from "@/components/demo";
-import { authorUrl, install, repoUrl } from "@/lib/shared";
+import { authorUrl, repoUrl } from "@/lib/shared";
 
-const quick = `import { createHighlighter } from "glyphline";
-import { pdfSource } from "glyphline/pdf";   // or domSource from "glyphline/dom"
+const reactCode = `import { GlyphOverlay, useDomSource } from "react-glyphline";
+import "glyphline/style.css";
+
+export function Article({ sentence, word }) {
+  const [ref, source] = useDomSource();
+  return (
+    <div style={{ position: "relative" }}>
+      <article ref={ref}>…</article>
+      <GlyphOverlay source={source} sentence={sentence} word={word} />
+    </div>
+  );
+}`;
+
+const svelteCode = `<script>
+  import { domText, GlyphOverlay } from "svelte-glyphline";
+  import "glyphline/style.css";
+
+  let { sentence, word } = $props();
+  const text = domText();
+</script>
+
+<div style="position: relative">
+  <article {@attach text.attach}>…</article>
+  <GlyphOverlay source={text.source} {sentence} {word} />
+</div>`;
+
+const coreCode = `import { createHighlighter } from "glyphline";
+import { pdfSource } from "glyphline/pdf"; // or domSource from "glyphline/dom"
 import "glyphline/style.css";
 
 const source = await pdfSource(page, { OPS });
 const hl = createHighlighter(svg, source, { trackSelection: true });
 
-hl.update({ sentence: 3, word: 41 });        // glides there`;
+hl.update({ sentence: 3, word: 41 }); // glides there`;
 
 export default function HomePage() {
   return (
@@ -52,11 +79,16 @@ export default function HomePage() {
                 GitHub
               </a>
               <code className="rounded-lg border bg-fd-card px-3 py-2 font-mono text-sm">
-                {install}
+                bun add react-glyphline
+              </code>
+              <code className="rounded-lg border bg-fd-card px-3 py-2 font-mono text-sm">
+                bun add svelte-glyphline
               </code>
             </div>
             <ul className="mt-8 grid gap-2 text-sm text-fd-muted-foreground sm:grid-cols-2">
-              <li>✦ Framework-free core, React and Svelte adapters</li>
+              <li>
+                ✦ Packages for React and Svelte 5, on a framework-free core
+              </li>
               <li>✦ pdf.js pages and plain HTML, one API</li>
               <li>✦ Interruptible motion, reduced-motion aware</li>
               <li>✦ No dependencies; pdf.js and React are optional peers</li>
@@ -101,14 +133,28 @@ export default function HomePage() {
         </p>
       </Section>
 
-      <Section eyebrow="Usage" title="One overlay, one call">
-        <DynamicCodeBlock lang="ts" code={quick} />
+      <Section eyebrow="Usage" title="One overlay over your text">
+        <Tabs items={["React", "Svelte", "No framework"]}>
+          <Tab value="React">
+            <DynamicCodeBlock lang="tsx" code={reactCode} />
+          </Tab>
+          <Tab value="Svelte">
+            <DynamicCodeBlock lang="svelte" code={svelteCode} />
+          </Tab>
+          <Tab value="No framework">
+            <DynamicCodeBlock lang="ts" code={coreCode} />
+          </Tab>
+        </Tabs>
         <p className="mt-5 text-fd-muted-foreground">
-          The{" "}
-          <Link className="underline" href="/docs/getting-started">
-            getting started guide
+          Each framework has its own section,{" "}
+          <Link className="underline" href="/docs/react">
+            React
           </Link>{" "}
-          covers React, Svelte and plain TypeScript, and the{" "}
+          and{" "}
+          <Link className="underline" href="/docs/svelte">
+            Svelte
+          </Link>
+          , and the{" "}
           <Link className="underline" href="/docs/playground">
             playground
           </Link>{" "}

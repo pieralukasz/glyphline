@@ -1,0 +1,85 @@
+{
+	"name": "glyphline",
+	"version": "0.1.0",
+	"description": "Text highlights that sit on the glyphs: a sentence outline that morphs, a word cursor that glides, a drawn selection and marks. For pdf.js pages (positions from the embedded fonts) and HTML. Framework-free; see react-glyphline and svelte-glyphline.",
+	"keywords": [
+		"highlight",
+		"text-highlight",
+		"pdf",
+		"pdfjs",
+		"pdf.js",
+		"read-aloud",
+		"tts",
+		"text-to-speech",
+		"karaoke",
+		"selection",
+		"annotation",
+		"svg",
+		"animation"
+	],
+	"homepage": "https://glyphline.lucaspiera.com",
+	"bugs": "https://github.com/pieralukasz/glyphline/issues",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/pieralukasz/glyphline.git",
+		"directory": "packages/glyphline"
+	},
+	"license": "MIT",
+	"author": "Łukasz Piera (https://lucaspiera.com)",
+	"type": "module",
+	"sideEffects": [
+		"**/*.css"
+	],
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./pdf": {
+			"types": "./dist/pdf/index.d.ts",
+			"default": "./dist/pdf/index.js"
+		},
+		"./dom": {
+			"types": "./dist/dom/index.d.ts",
+			"default": "./dist/dom/index.js"
+		},
+		"./style.css": {
+			"types": "./dist/css.d.ts",
+			"default": "./dist/style.css"
+		},
+		"./package.json": "./package.json",
+		"./pdf.css": {
+			"types": "./dist/css.d.ts",
+			"default": "./dist/pdf.css"
+		}
+	},
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "tsdown && cp src/style.css src/pdf.css src/css.d.ts dist/",
+		"dev": "tsdown --watch",
+		"typecheck": "tsc --noEmit",
+		"test": "vitest run",
+		"check:package": "publint",
+		"prepublishOnly": "bun run typecheck && bun run test && bun run build"
+	},
+	"peerDependencies": {
+		"pdfjs-dist": ">=4"
+	},
+	"peerDependenciesMeta": {
+		"pdfjs-dist": {
+			"optional": true
+		}
+	},
+	"devDependencies": {
+		"pdfjs-dist": "^6.4.299"
+	}
+}

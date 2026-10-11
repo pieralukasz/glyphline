@@ -12,6 +12,7 @@ import {
   Playground,
   ReadAlong,
   SelectionDemo,
+  SvelteDemo,
 } from "@/components/demo";
 
 export function getMDXComponents(components?: MDXComponents) {
@@ -29,6 +30,7 @@ export function getMDXComponents(components?: MDXComponents) {
     ReadAlong,
     SelectionDemo,
     Step,
+    SvelteDemo,
     Steps,
     Tab,
     Tabs,

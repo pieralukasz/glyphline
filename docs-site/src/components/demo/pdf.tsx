@@ -2,12 +2,12 @@
 import type { HighlighterOptions, HighlightState } from "glyphline";
 import { wordAtPoint } from "glyphline";
 import { type PdfTextSource, pdfSource } from "glyphline/pdf";
-import { GlyphOverlay } from "glyphline/react";
 import type { PDFDocumentProxy, PDFPageProxy } from "pdfjs-dist";
 import { type ReactNode, useEffect, useRef, useState } from "react";
+import { GlyphOverlay } from "react-glyphline";
 import { cn } from "@/lib/cn";
 import { asset } from "@/lib/shared";
-import "../../../../src/pdf.css";
+import "../../../../packages/glyphline/src/pdf.css";
 
 type Pdfjs = typeof import("pdfjs-dist");
 type TextLayer = InstanceType<Pdfjs["TextLayer"]>;

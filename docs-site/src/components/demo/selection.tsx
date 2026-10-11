@@ -1,9 +1,8 @@
 "use client";
 import type { Mark, TextRange } from "glyphline";
-import { type DomTextSource, domSource } from "glyphline/dom";
 import type { PdfTextSource } from "glyphline/pdf";
-import { GlyphOverlay } from "glyphline/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { GlyphOverlay, useDomSource } from "react-glyphline";
 import { Button, Segmented, Toggle, Toolbar } from "./controls";
 import { PdfPage } from "./pdf";
 
@@ -38,14 +37,10 @@ export function SelectionDemo({
     text: string;
   } | null>(null);
   const [notes, setNotes] = useState<Note[]>([]);
-  const [html, setHtml] = useState<DomTextSource | null>(null);
   const [pdf, setPdf] = useState<PdfTextSource | null>(null);
-  const article = useRef<HTMLDivElement>(null);
+  const [article, html] = useDomSource<HTMLDivElement>();
   const source = mode === "html" ? html : pdf;
 
-  useEffect(() => {
-    if (mode === "html" && article.current) setHtml(domSource(article.current));
-  }, [mode]);
   const switchMode = (m: "html" | "pdf") => {
     setMode(m);
     setNotes([]);

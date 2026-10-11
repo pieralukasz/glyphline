@@ -4,6 +4,9 @@
     "index",
     "getting-started",
     "playground",
+    "---Frameworks---",
+    "react",
+    "svelte",
     "---Guides---",
     "pdf",
     "html",
@@ -15,7 +18,6 @@
     "accuracy",
     "---Reference---",
     "api",
-    "adapters",
     "limits"
   ]
 }

@@ -1,0 +1,48 @@
+---
+title: Svelte API
+description: GlyphOverlay, the highlight action, the glyphline attachment, domText and asyncText.
+---
+
+```ts
+import { asyncText, domText, GlyphOverlay, glyphline, highlight } from "svelte-glyphline";
+```
+
+## `<GlyphOverlay>`
+
+Renders the `<svg>` overlay. Put it inside a positioned element that wraps the text. Other attributes are passed to the svg.
+
+<TypeTable
+  type={{
+    source: { type: "TextSource | null | undefined", description: "The text. Nothing is drawn while it is null." },
+    sentence: { type: "number | { start, end } | null", description: "Sentence index or character range." },
+    word: { type: "number | { start, end } | null", description: "Word index or character range." },
+    marks: { type: "Mark[]", description: "Saved highlights: { id, start, end, className? }." },
+    selection: { type: "number | { start, end } | null", description: "Drawn selection, when you manage it yourself." },
+    options: { type: "HighlighterOptions", description: "Timing, shapes, trackSelection. See the core API." },
+    theme: { type: '"light" | "dark"', description: "Force the light or dark colours of glyphline/style.css." },
+    class: { type: "string", description: "Added next to gl-overlay." },
+    "bind:highlighter": { type: "Highlighter | null", description: "The core highlighter, for refresh() and friends." },
+  }}
+/>
+
+## `use:highlight={params}`
+
+Action for an `<svg>` you render yourself. `params` are the props above (`source`, `sentence`, `word`, `marks`, `selection`, `options`). Works in Svelte 4 and 5.
+
+## `{@attach glyphline(params)}`
+
+The same as a Svelte 5 attachment.
+
+## `domText(options?)`
+
+`{ source, attach }`: put `{@attach text.attach}` on the element; `text.source` is reactive and rebuilt when the element's text changes. `options` are those of [`domSource`](/docs/api#domsource).
+
+## `asyncText(make)`
+
+`{ source }`, resolved from `make()` in an effect: it reruns when anything `make` reads changes and drops results that arrive after a newer run. Return `null` for "nothing yet". Call it during component setup.
+
+```ts
+const text = asyncText(() => page && pdfSource(page, { OPS }));
+```
+
+Everything else (sources, `wordAtPoint`, shapes, motion) comes from the core: see [API](/docs/api).

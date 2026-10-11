@@ -1,107 +1,26 @@
 {
-  "name": "glyphline",
-  "version": "0.1.0",
-  "description": "Text highlights that sit on the glyphs: a sentence outline that morphs, a word cursor that glides, a drawn selection and static marks. For PDF.js pages (positions from the embedded fonts) and plain HTML. Framework-free core with React and Svelte adapters.",
-  "keywords": [
-    "highlight",
-    "text-highlight",
-    "pdf",
-    "pdfjs",
-    "pdf.js",
-    "read-aloud",
-    "tts",
-    "text-to-speech",
-    "karaoke",
-    "selection",
-    "annotation",
-    "svg",
-    "animation",
-    "react",
-    "svelte"
-  ],
-  "homepage": "https://glyphline.lucaspiera.com",
-  "bugs": "https://github.com/pieralukasz/glyphline/issues",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pieralukasz/glyphline.git"
-  },
-  "license": "MIT",
-  "author": "Łukasz Piera (https://lucaspiera.com)",
-  "type": "module",
-  "sideEffects": [
-    "**/*.css"
-  ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./pdf": {
-      "types": "./dist/pdf/index.d.ts",
-      "default": "./dist/pdf/index.js"
-    },
-    "./dom": {
-      "types": "./dist/dom/index.d.ts",
-      "default": "./dist/dom/index.js"
-    },
-    "./react": {
-      "types": "./dist/react/index.d.ts",
-      "default": "./dist/react/index.js"
-    },
-    "./svelte": {
-      "types": "./dist/svelte/index.d.ts",
-      "default": "./dist/svelte/index.js"
-    },
-    "./style.css": "./dist/style.css",
-    "./package.json": "./package.json",
-    "./pdf.css": "./dist/pdf.css"
-  },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "scripts": {
-    "build": "tsdown && cp src/style.css src/pdf.css dist/",
-    "dev": "tsdown --watch",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:browser": "vitest run --config vitest.browser.config.ts",
-    "check:package": "publint",
-    "lint": "biome check .",
-    "prepublishOnly": "bun run typecheck && bun run test && bun run build"
-  },
-  "peerDependencies": {
-    "pdfjs-dist": ">=4",
-    "react": ">=18"
-  },
-  "peerDependenciesMeta": {
-    "pdfjs-dist": {
-      "optional": true
-    },
-    "react": {
-      "optional": true
-    }
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.5.15",
-    "@types/node": "^24",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@vitest/browser-playwright": "^4",
-    "happy-dom": "^20.14.6",
-    "pdfjs-dist": "^6.4.299",
-    "playwright": "^1.60",
-    "publint": "^0.3.25",
-    "react": "^19.3.0",
-    "react-dom": "^19",
-    "tsdown": "^0.23.0",
-    "typescript": "^6",
-    "vitest": "^4"
-  },
-  "packageManager": "bun@1.4.2"
+	"name": "glyphline-monorepo",
+	"private": true,
+	"type": "module",
+	"workspaces": [
+		"packages/*"
+	],
+	"scripts": {
+		"build": "bun run --filter glyphline build && bun run --filter react-glyphline --filter svelte-glyphline build",
+		"typecheck": "bun run --filter '*' typecheck",
+		"test": "bun run --filter '*' test",
+		"check:package": "bun run --filter '*' check:package",
+		"lint": "biome check ."
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.5.15",
+		"@types/node": "^24",
+		"@vitest/browser-playwright": "^4",
+		"playwright": "^1.60",
+		"publint": "^0.3.25",
+		"tsdown": "^0.23.0",
+		"typescript": "^6",
+		"vitest": "^4"
+	},
+	"packageManager": "bun@1.4.2"
 }

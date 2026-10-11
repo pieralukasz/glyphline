@@ -9,8 +9,8 @@
     "types:check": "next typegen && tsc --noEmit",
     "lint": "biome check",
     "format": "biome format --write",
-    "prebuild": "node scripts/copy-worker.mjs",
-    "predev": "node scripts/copy-worker.mjs",
+    "prebuild": "node scripts/copy-worker.mjs && vite build -c svelte-demo/vite.config.ts",
+    "predev": "node scripts/copy-worker.mjs && vite build -c svelte-demo/vite.config.ts",
     "demo-pdf": "node scripts/make-demo-pdf.mjs"
   },
   "trustedDependencies": [
@@ -28,15 +28,18 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.14",
+    "@sveltejs/vite-plugin-svelte": "^7.2.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/mdx": "^2.0.14",
     "@types/node": "^26.6.1",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "playwright": "^1.60.0",
     "postcss": "^8.5.28",
     "serve": "^14.2.6",
+    "svelte": "^5.57.1",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
-    "playwright": "^1.60.0"
+    "vite": "^8.0.0"
   }
 }
