@@ -33,14 +33,25 @@ function legacyPolyfills() {
   if (proto[Symbol.asyncIterator]) return;
   proto[Symbol.asyncIterator] = async function* (this: ReadableStream) {
     const reader = this.getReader();
+    let finished = false;
     try {
       while (true) {
         const { done, value } = await reader.read();
-        if (done) return;
+        if (done) {
+          finished = true;
+          return;
+        }
         yield value;
       }
+    } catch (error) {
+      finished = true;
+      throw error;
     } finally {
-      reader.releaseLock();
+      try {
+        if (!finished) await reader.cancel();
+      } finally {
+        reader.releaseLock();
+      }
     }
   };
 }
@@ -52,10 +63,12 @@ function legacyPolyfills() {
  */
 export function pdfjs(): Promise<Pdfjs> {
   legacyPolyfills();
-  lib ??= (import("pdfjs-dist/legacy/build/pdf.mjs") as Promise<Pdfjs>).then((m) => {
-    m.GlobalWorkerOptions.workerSrc = asset("/pdf.worker.min.mjs");
-    return m;
-  });
+  lib ??= (import("pdfjs-dist/legacy/build/pdf.mjs") as Promise<Pdfjs>).then(
+    (m) => {
+      m.GlobalWorkerOptions.workerSrc = asset("/pdf.worker.min.mjs");
+      return m;
+    },
+  );
   return lib;
 }
 
@@ -122,6 +135,13 @@ export function PdfPage({
 
   useEffect(() => {
     let off = false;
+    textLayer.current?.cancel();
+    textLayer.current = null;
+    layer.current?.replaceChildren();
+    setPage(null);
+    setBase(null);
+    setLayered(null);
+    setError(null);
     (async () => {
       const m = await pdfjs();
       const doc = await openDoc(url ?? demoPdf());
@@ -132,7 +152,9 @@ export function PdfPage({
       if (off) return;
       setPage(p);
       setBase(s);
-    })().catch((e: Error) => setError(e.message));
+    })().catch((e: Error) => {
+      if (!off) setError(e.message);
+    });
     return () => {
       off = true;
     };
@@ -157,7 +179,9 @@ export function PdfPage({
     const host = box.current;
     const tlEl = layer.current;
     if (!page || !base || !width || !c || !host || !tlEl) return;
+    setError(null);
     let cancelled = false;
+    let pendingLayer: TextLayer | null = null;
     const unit = page.getViewport({ scale: 1 });
     const scale = Math.min(maxScale, width / unit.width);
     const vp = page.getViewport({ scale });
@@ -171,31 +195,39 @@ export function PdfPage({
     host.style.setProperty("--total-scale-factor", String(scale));
     const task = page.render({ canvas: c, canvasContext: ctx, viewport: vp });
     (async () => {
-      try {
-        await task.promise;
-      } catch {
-        return; // cancelled by a newer size
-      }
+      await task.promise;
       if (cancelled) return;
       const m = await pdfjs();
+      if (cancelled) return;
       if (!textLayer.current) {
+        const textContentSource = await page.getTextContent();
+        if (cancelled) return;
         const tl = new m.TextLayer({
-          textContentSource: await page.getTextContent(),
+          textContentSource,
           container: tlEl,
           viewport: vp,
         });
-        textLayer.current = tl;
+        pendingLayer = tl;
         await tl.render();
         if (cancelled) return;
+        textLayer.current = tl;
+        pendingLayer = null;
         // the text layer becomes the first fallback (and makes selections readable)
         setLayered(base.withTextLayer(tl.textDivs, tlEl, scale));
       } else {
         textLayer.current.update({ viewport: vp });
       }
-    })();
+    })().catch((e: Error) => {
+      if (cancelled) return;
+      setError(e.message);
+    });
     return () => {
       cancelled = true;
       task.cancel();
+      if (pendingLayer) {
+        pendingLayer.cancel();
+        tlEl.replaceChildren();
+      }
     };
   }, [page, base, width, maxScale]);
 

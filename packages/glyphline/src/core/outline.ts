@@ -225,7 +225,7 @@ const lerpBox = (a: Box, b: Box, t: number): Box => ({
  * paired top to bottom; when one side has more lines, its extra lines grow out of (or collapse into)
  * the nearest line of the other side, so the outline stays one connected blob while it morphs.
  * A pair on the same visual line (the next sentence continues the line) does not slide as a rigid
- * block across the text: it stretches like the word cursor, leading edge first.
+ * block across the text: it stretches like the word cursor, capped at one box height.
  * Returns null when the shapes cannot be paired (different number of runs).
  */
 export function morphShape(from: Shape, to: Shape): ((t: number) => Shape) | null {
@@ -257,32 +257,31 @@ export function sameLine(a: Box, b: Box) {
 }
 
 /**
- * Word cursor motion along a line, like a caret that stretches: during the first half the edge on
- * the side of the move runs ahead to the new word (the box spans old + new word), during the second
- * half the trailing edge catches up. `t` is the eased progress 0..1.
+ * Glide along a line with a soft stretch, capped at one box height rather than the distance
+ * between targets. `t` is the eased progress 0..1.
  */
 export function stretchBox(from: Box, to: Box, t: number): Box {
-	const lead = Math.min(1, t * 2);
-	const trail = Math.max(0, t * 2 - 1);
-	const forward = to.x + to.w / 2 >= from.x + from.w / 2;
-	const left = forward ? lerp(from.x, to.x, trail) : lerp(from.x, to.x, lead);
-	const right = forward
-		? lerp(from.x + from.w, to.x + to.w, lead)
-		: lerp(from.x + from.w, to.x + to.w, trail);
-	const y = lerp(from.y, to.y, t);
-	const h = lerp(from.h, to.h, t);
-	return { x: left, y, w: right - left, h };
+	const distance = Math.abs(to.x + to.w / 2 - from.x - from.w / 2);
+	const extra = Math.min(distance, Math.max(from.h, to.h)) * 4 * t * (1 - t);
+	const box = lerpBox(from, to, t);
+	return { ...box, x: box.x - extra / 2, w: box.w + extra };
 }
 
-/** Rounded rectangle path for a single word. */
-export function wordPath(b: Box, { pad = 1.5, radius = 3 } = {}): string {
+/** Rounded rectangle; the default radius nests inside the sentence's 5-unit arc with a 0.5-unit inset. */
+export function wordPath(b: Box, { pad = 1.5, radius = 4.5 } = {}): string {
 	const x = b.x - pad;
 	const y = b.y - pad;
 	const w = b.w + 2 * pad;
 	const h = b.h + 2 * pad;
-	const r = Math.min(radius, w / 2, h / 2);
-	const f = (v: number) => v.toFixed(2);
-	return `M${f(x + r)} ${f(y)} H${f(x + w - r)} Q${f(x + w)} ${f(y)} ${f(x + w)} ${f(y + r)} V${f(y + h - r)} Q${f(x + w)} ${f(y + h)} ${f(x + w - r)} ${f(y + h)} H${f(x + r)} Q${f(x)} ${f(y + h)} ${f(x)} ${f(y + h - r)} V${f(y + r)} Q${f(x)} ${f(y)} ${f(x + r)} ${f(y)} Z`;
+	return roundedPath(
+		[
+			[x + w, y],
+			[x + w, y + h],
+			[x, y + h],
+			[x, y]
+		],
+		radius
+	);
 }
 
 /** Several word parts (a word broken across lines) as one `d` attribute. */

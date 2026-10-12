@@ -32,11 +32,11 @@ type Case = "stretch" | "travel" | "pop" | "sentence";
 const CASES: Record<Case, { label: string; text: string }> = {
   stretch: {
     label: "Along a line",
-    text: "The leading edge runs to the next word in the first half, the trailing edge catches up in the second. For a moment the cursor spans both words, like ink spreading.",
+    text: "Nearby words glide with a soft stretch capped at one box height. Distant words fade out and relocate instead of stretching across the text.",
   },
   travel: {
     label: "To another line",
-    text: "Vertically it stretches the same way (the edge on the side of the move arrives first), horizontally it glides. Going down a line reads as the same motion as moving along it.",
+    text: "Nearby line wraps glide with bounded vertical stretch. A vertical centre gap over two box heights, as shown here, fades out and relocates without a tall ribbon.",
   },
   pop: {
     label: "From nothing",
@@ -44,7 +44,7 @@ const CASES: Record<Case, { label: string; text: string }> = {
   },
   sentence: {
     label: "Sentence",
-    text: "Sentence outlines with the same number of columns morph line by line; extra lines grow out of the nearest one. A line on the same row stretches like the cursor.",
+    text: "Nearby sentence outlines with matching columns morph line by line; extra lines grow out of the nearest one. Distant or incompatible layouts fade out and relocate.",
   },
 };
 

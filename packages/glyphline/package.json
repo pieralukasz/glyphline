@@ -1,6 +1,6 @@
 {
 	"name": "glyphline",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Text highlights that sit on the glyphs: a sentence outline that morphs, a word cursor that glides, a drawn selection and marks. For pdf.js pages (positions from the embedded fonts) and HTML. Framework-free core with React (glyphline/react) and Svelte 5 (glyphline/svelte) adapters.",
 	"keywords": [
 		"highlight",

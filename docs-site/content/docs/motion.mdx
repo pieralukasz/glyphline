@@ -7,6 +7,14 @@ Each highlight is a tween from what is on screen now to the new target. The inte
 
 <MotionAnatomy />
 
+## Nearby moves and long jumps
+
+Nearby words glide with a soft stretch capped at one box height, rather than spanning both targets. Nearby line wraps keep that bounded stretch vertically. A distant word fades out in place, relocates while invisible, and fades in at its destination: no ribbon across the intervening text.
+
+The distance policy uses the larger box height: a same-line gap over four heights, or a vertical centre separation over two heights, triggers relocation. Sentence outlines also relocate when their paired runs have no nearby lines, or their run counts differ. Nearby compatible sentence outlines still morph.
+
+The default word corners use circular arcs with radius 4.5 and padding 1.5; the sentence defaults use radius 5 and padding 2. At a shared edge, the corners are concentric with an even 0.5-unit inset. Custom shape options can change that relationship.
+
 ## Interruptions
 
 A new target while a move is running starts a new tween from the current frame, not from the old target. Fast reading never queues moves up; the cursor bends toward the latest word.
@@ -17,9 +25,10 @@ A new target while a move is running starts a new tween from the current frame, 
 | --- | --- | --- |
 | Word cursor | 240 ms | ease-out cubic |
 | Sentence outline | 340 ms | ease-out cubic |
+| Distant word / sentence relocation | 180 ms | ease-out cubic |
 | Selection | 120 ms | ease-out cubic |
 
-At 240 words per minute a word lasts 250 ms, so the cursor lands before the voice moves on. The outline is slower because it travels further and should draw the eye less.
+At 240 words per minute a word lasts 250 ms, so the cursor lands before the voice moves on. The nearby outline morph remains slower to draw the eye less; distant relocations finish in 180 ms by default. Explicit `duration.word` and `duration.sentence` values override both nearby and distant timing.
 
 ## Reduced motion
 

@@ -6,6 +6,8 @@ import {
 	easeOutCubic,
 	interpolateSentence,
 	interpolateWord,
+	relocatesSentence,
+	relocatesWord,
 	type SentenceFrame,
 	type WordFrame
 } from './motion.ts';
@@ -56,7 +58,7 @@ export type HighlighterOptions = {
 	animate?: boolean;
 	/** honour `prefers-reduced-motion: reduce` by jumping (default true) */
 	respectReducedMotion?: boolean;
-	/** ms, defaults: word 240, sentence 340, selection 120 */
+	/** ms, defaults: word 240, sentence 340, selection 120; distant word/sentence moves 180 */
 	duration?: { word?: number; sentence?: number; selection?: number };
 	/** progress 0..1 to eased 0..1, default ease-out cubic */
 	easing?: (t: number) => number;
@@ -235,7 +237,9 @@ export function createHighlighter(
 			: null;
 		sentence.set(
 			target,
-			animate ? (opts.duration?.sentence ?? 340) : 0,
+			animate
+				? (opts.duration?.sentence ?? (relocatesSentence(sentence.value, target) ? 180 : 340))
+				: 0,
 			opts.easing ?? easeOutCubic
 		);
 	};
@@ -243,7 +247,11 @@ export function createHighlighter(
 		const boxes = boxesOf(rangeOf(state.word, 'word'));
 		wordTail = boxes.slice(1);
 		const target: WordFrame = boxes[0] ? { box: boxes[0], o: 1 } : null;
-		word.set(target, animate ? (opts.duration?.word ?? 240) : 0, opts.easing ?? easeOutCubic);
+		word.set(
+			target,
+			animate ? (opts.duration?.word ?? (relocatesWord(word.value, target) ? 180 : 240)) : 0,
+			opts.easing ?? easeOutCubic
+		);
 	};
 	const placeSelection = (animate: boolean) => {
 		const boxes = boxesOf(rangeOf(state.selection, 'sentence'));

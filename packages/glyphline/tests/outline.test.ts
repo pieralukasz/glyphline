@@ -6,10 +6,19 @@ import {
 	outlinePath,
 	sentenceShape,
 	shapePath,
-	stretchBox
+	stretchBox,
+	wordPath
 } from '../src/core/outline.ts';
 
 const w = (x: number, y: number, w = 30, h = 10) => ({ x, y, w, h });
+
+describe('wordPath', () => {
+	it('uses concentric circular corners inside the default sentence boundary without removing the inset', () => {
+		const b = w(10, 100, 60, 22);
+		expect(wordPath(b)).toBe(shapePath(sentenceShape([b], { pad: 1.5 }), 4.5));
+		expect(wordPath(b, { pad: 4, radius: 2 })).toBe(shapePath(sentenceShape([b], { pad: 4 }), 2));
+	});
+});
 
 describe('mergeLines', () => {
 	it('merges the words of one line into one box', () => {
@@ -127,9 +136,8 @@ describe('morphShape', () => {
 		const from = sentenceShape([w(10, 100, 200)]);
 		const to = sentenceShape([w(240, 100, 150)]);
 		const half = morphShape(from, to)?.(0.5)?.[0][0];
-		// the old sentence still starts where it did, the box already reaches the end of the new one
-		expect(half?.x).toBeCloseTo(from[0][0].x);
-		expect((half?.x ?? 0) + (half?.w ?? 0)).toBeCloseTo(to[0][0].x + to[0][0].w);
+		expect(half?.x).toBeLessThan((from[0][0].x + to[0][0].x) / 2);
+		expect(half?.w).toBeLessThanOrEqual(Math.max(from[0][0].w, to[0][0].w) + 14);
 		expect(morphShape(from, to)?.(1)).toEqual(to);
 	});
 
@@ -143,16 +151,17 @@ describe('morphShape', () => {
 describe('stretchBox', () => {
 	const a = { x: 10, y: 100, w: 30, h: 10 };
 	const b = { x: 80, y: 100, w: 40, h: 10 };
-	it('first reaches the next word with the leading edge, then pulls the trailing edge', () => {
+	it('leads with the forward edge but bounds expansion to one line height', () => {
 		const half = stretchBox(a, b, 0.5);
-		expect(half.x).toBe(10);
-		expect(half.x + half.w).toBe(120);
+		expect(half.x).toBeLessThan(45);
+		expect(half.x + half.w).toBeGreaterThan(80);
+		expect(half.w).toBeLessThanOrEqual(50);
 		expect(stretchBox(a, b, 1)).toEqual(b);
 	});
 	it('stretches to the left when the next word is earlier on the line', () => {
 		const half = stretchBox(b, a, 0.5);
-		expect(half.x).toBe(10);
-		expect(half.x + half.w).toBe(120);
+		expect(half.x).toBeLessThan(45);
+		expect(half.w).toBeLessThanOrEqual(50);
 	});
 });
 

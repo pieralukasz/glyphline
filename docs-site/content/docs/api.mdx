@@ -41,10 +41,10 @@ Adds its paths to `svg`, sets its `viewBox` from the source and returns:
   type={{
     animate: { type: "boolean", default: "true", description: "Off: highlights jump." },
     respectReducedMotion: { type: "boolean", default: "true", description: "Jump when prefers-reduced-motion is reduce." },
-    duration: { type: "{ word?, sentence?, selection? }", default: "240, 340, 120", description: "Milliseconds." },
+    duration: { type: "{ word?, sentence?, selection? }", default: "240, 340, 120", description: "Milliseconds; distant word/sentence relocations default to 180 ms. Explicit values override both nearby and distant moves." },
     easing: { type: "(t: number) => number", default: "easeOutCubic" },
     sentenceShape: { type: "{ pad?, radius?, snap? }", default: "2, 5, 4", description: "Outline of sentences, selections and marks, in overlay units." },
-    wordShape: { type: "{ pad?, radius? }", default: "1.5, 3", description: "Rounded box of the cursor." },
+    wordShape: { type: "{ pad?, radius? }", default: "1.5, 4.5", description: "Rounded box of the cursor." },
     classPrefix: { type: "string", default: '"gl"' },
     trackSelection: { type: "boolean | { snapToWords?, onChange? }", default: "false", description: "Draw the user's selection inside this source." },
   }}

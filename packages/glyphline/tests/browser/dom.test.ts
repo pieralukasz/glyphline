@@ -132,7 +132,8 @@ describe('createHighlighter on HTML', () => {
 		hl.update({ word: 0 });
 		await new Promise((r) => setTimeout(r, 260));
 		const start = svg.querySelector('.gl-word')?.getAttribute('d');
-		hl.update({ word: 4 });
+		// Adjacent moves interpolate geometry; distant targets intentionally fade in place.
+		hl.update({ word: 1 });
 		await raf();
 		await raf();
 		const mid = svg.querySelector('.gl-word')?.getAttribute('d');

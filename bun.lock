@@ -17,7 +17,7 @@
     },
     "packages/glyphline": {
       "name": "glyphline",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "devDependencies": {
         "@sveltejs/package": "^3.0.0",
         "@sveltejs/vite-plugin-svelte": "^7.2.0",
