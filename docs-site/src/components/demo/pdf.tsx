@@ -13,9 +13,46 @@ type Pdfjs = typeof import("pdfjs-dist");
 type TextLayer = InstanceType<Pdfjs["TextLayer"]>;
 
 let lib: Promise<Pdfjs> | null = null;
-/** pdf.js touches the DOM at import time: load it in the browser only, once. */
+
+/**
+ * What the pdf.js legacy build still expects from the browser: Promise.withResolvers
+ * (Safari 17.4+) and `for await` over a ReadableStream (missing in Safari before 27,
+ * pdf.js then fails with "is not async iterable" and draws no text layer).
+ */
+function legacyPolyfills() {
+  Promise.withResolvers ??= <T,>() => {
+    let resolve!: (value: T | PromiseLike<T>) => void;
+    let reject!: (reason?: unknown) => void;
+    const promise = new Promise<T>((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
+  };
+  const proto: { [Symbol.asyncIterator]?: unknown } = ReadableStream.prototype;
+  if (proto[Symbol.asyncIterator]) return;
+  proto[Symbol.asyncIterator] = async function* (this: ReadableStream) {
+    const reader = this.getReader();
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) return;
+        yield value;
+      }
+    } finally {
+      reader.releaseLock();
+    }
+  };
+}
+
+/**
+ * pdf.js touches the DOM at import time: load it in the browser only, once.
+ * Legacy build: the modern one calls Map.getOrInsertComputed and friends and throws
+ * "undefined is not a function" on iOS Safari before 26.2.
+ */
 export function pdfjs(): Promise<Pdfjs> {
-  lib ??= import("pdfjs-dist").then((m) => {
+  legacyPolyfills();
+  lib ??= (import("pdfjs-dist/legacy/build/pdf.mjs") as Promise<Pdfjs>).then((m) => {
     m.GlobalWorkerOptions.workerSrc = asset("/pdf.worker.min.mjs");
     return m;
   });
