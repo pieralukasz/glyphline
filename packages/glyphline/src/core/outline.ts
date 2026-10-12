@@ -106,9 +106,9 @@ export type Shape = Box[][];
 
 /**
  * Padded, cleaned-up line boxes of a range. Lines of one run share their top/bottom edges (no
- * gaps, no slanted joins), and a left or right edge that differs from the neighbouring line by
- * less than `snap` is aligned to it: justified text ends a few tenths of a pixel apart per line,
- * and without snapping the outline gets tiny steps and slanted edges there.
+ * gaps, no slanted joins). Consecutive left/right edges spanning less than `snap` align to their
+ * outermost edge. Bounding the whole cluster preserves real indentation and gradual ragged edges;
+ * aligning every member avoids tiny residual steps in justified text.
  */
 export function sentenceShape(boxes: Box[], { pad = 2, snap = 4 } = {}): Shape {
 	return groupRuns(boxes).map((run) => {
@@ -121,23 +121,32 @@ export function sentenceShape(boxes: Box[], { pad = 2, snap = 4 } = {}): Shape {
 	});
 }
 
-/** Align near-equal left and right edges of consecutive lines (to the outer one of the two). */
+/** Align a whole near-equal edge cluster; never let pairwise snapping leave earlier lines behind. */
 function snapEdges(lines: Box[], snap: number) {
-	for (let i = 1; i < lines.length; i++) {
-		const a = lines[i - 1];
-		const b = lines[i];
-		if (Math.abs(a.x - b.x) < snap) {
-			const x = Math.min(a.x, b.x);
-			a.w += a.x - x;
-			b.w += b.x - x;
-			a.x = b.x = x;
-		}
-		const ra = a.x + a.w;
-		const rb = b.x + b.w;
-		if (Math.abs(ra - rb) < snap) {
-			const r = Math.max(ra, rb);
-			a.w = r - a.x;
-			b.w = r - b.x;
+	for (const right of [false, true]) {
+		const edges = lines.map((b) => (right ? b.x + b.w : b.x));
+		for (let start = 0; start < lines.length; ) {
+			let end = start + 1;
+			let min = edges[start];
+			let max = min;
+			while (end < lines.length) {
+				const nextMin = Math.min(min, edges[end]);
+				const nextMax = Math.max(max, edges[end]);
+				// Bound the entire cluster, not each neighbour: a gradual rag must stay ragged.
+				if (nextMax - nextMin >= snap) break;
+				min = nextMin;
+				max = nextMax;
+				end++;
+			}
+			for (let i = start; i < end; i++) {
+				const b = lines[i];
+				if (right) b.w = max - b.x;
+				else {
+					b.w += b.x - min;
+					b.x = min;
+				}
+			}
+			start = end;
 		}
 	}
 }
@@ -155,16 +164,19 @@ function runPolygon(run: Box[]): Pt[] {
 		const b = run[i];
 		pts.push([b.x, b.y + b.h], [b.x, b.y]);
 	}
-	// drop repeated points and middle points of straight segments (lines with equal edges)
-	const unique = pts.filter((p, i) => {
-		const q = pts[(i - 1 + pts.length) % pts.length];
-		return Math.abs(p[0] - q[0]) > 0.01 || Math.abs(p[1] - q[1]) > 0.01;
+	// Simplify at the same precision as the SVG output. A fuzzy duplicate test followed by
+	// a cross-product tolerance can delete only half a tiny step, leaving a nearly straight
+	// "corner" that roundedPath draws as a full-radius semicircle.
+	const rounded = pts.map(([x, y]): Pt => [Number(x.toFixed(2)), Number(y.toFixed(2))]);
+	const unique = rounded.filter((p, i) => {
+		const q = rounded[(i - 1 + rounded.length) % rounded.length];
+		return p[0] !== q[0] || p[1] !== q[1];
 	});
 	return unique.filter((p, i) => {
 		const a = unique[(i - 1 + unique.length) % unique.length];
 		const c = unique[(i + 1) % unique.length];
 		const cross = (p[0] - a[0]) * (c[1] - p[1]) - (p[1] - a[1]) * (c[0] - p[0]);
-		return Math.abs(cross) > 0.01;
+		return cross !== 0;
 	});
 }
 

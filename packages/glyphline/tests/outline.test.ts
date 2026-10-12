@@ -106,6 +106,65 @@ describe('outlinePath', () => {
 		expect((outlinePath(windward).match(/A/g) ?? []).length).toBe(8);
 	});
 
+	it('aligns the entire near-equal edge cluster, not just the last pair', () => {
+		const shape = sentenceShape([
+			w(10.003, 10, 169.1106, 12),
+			w(10.002, 25, 166.2595, 12),
+			w(10.001, 40, 169.1143, 12),
+			w(10, 55, 169.1197, 12),
+			w(10, 70, 169.1152, 12),
+			w(10, 85, 169.1151, 12),
+			w(10, 100, 161.9138, 12),
+			w(10, 115, 169.1233, 12),
+			w(10, 130, 64.7492, 12)
+		]);
+		const run = shape[0];
+		expect(new Set(run.map((b) => b.x))).toEqual(new Set([8]));
+		expect(new Set(run.slice(0, 6).map((b) => b.x + b.w))).toEqual(new Set([181.1197]));
+		// Real indentation and the short final line must not become a bounding rectangle.
+		expect(run[6].x + run[6].w).toBeCloseTo(173.9138);
+		expect(run[8].x + run[8].w).toBeCloseTo(76.7492);
+		expect((shapePath(shape).match(/A/g) ?? []).length).toBe(10);
+	});
+
+	it('does not turn sub-pixel steps into full-radius semicircles when snapping is disabled', () => {
+		const shape = sentenceShape([w(10, 10, 100, 12), w(10, 25, 100.001, 12)], { snap: 0 });
+		// Both ends serialize to x=112.00: one rectangle, not a false corner on its right edge.
+		expect((shapePath(shape).match(/A/g) ?? []).length).toBe(4);
+	});
+
+	it('bounds snap clusters so a gradual rag is not flattened', () => {
+		const boxes = [100, 103, 106, 109].map((width, i) => w(10, 10 + i * 15, width, 12));
+		const run = sentenceShape(boxes)[0];
+		expect(run.map((b) => b.x + b.w)).toEqual([115, 115, 121, 121]);
+		expect(sentenceShape(boxes, { snap: 0 })[0].map((b) => b.x + b.w)).toEqual([
+			112, 115, 118, 121
+		]);
+	});
+
+	it('snaps within each column without changing source boxes or the word cursor', () => {
+		const boxes = [w(10, 10, 100), w(10, 25, 102), w(200, 10, 100), w(200, 25, 98)];
+		const original = structuredClone(boxes);
+		const word = wordPath(boxes[0]);
+		const shape = sentenceShape(boxes);
+		expect(shape).toHaveLength(2);
+		expect(shape.map((run) => run.map((b) => b.x + b.w))).toEqual([
+			[114, 114],
+			[302, 302]
+		]);
+		expect(boxes).toEqual(original);
+		expect(wordPath(boxes[0])).toBe(word);
+		expect((shapePath(shape).match(/Z/g) ?? []).length).toBe(2);
+	});
+
+	it.each([0.001, -0.001, 0.009, -0.009])('keeps tiny edge steps orthogonal (%s)', (delta) => {
+		const d = outlinePath([w(10, 10, 100, 12), w(10, 25, 100 + delta, 12)], { snap: 0 });
+		for (const [a, b] of segments(d)) {
+			expect(a[0] === b[0] || a[1] === b[1]).toBe(true);
+		}
+		expect(d).not.toMatch(/NaN|Infinity/);
+	});
+
 	it('aligns justified line ends that differ by a fraction of a pixel', () => {
 		const shape = sentenceShape([
 			{ x: 15, y: 10, w: 485.4, h: 12 },
