@@ -47,7 +47,7 @@ hl.update({ sentence: 3, word: 41 }); // glides there`;
 
 export default function HomePage() {
   return (
-    <main className="flex flex-col">
+    <main className="gl-home flex flex-col">
       <section className="gl-ruled border-b">
         <div className="mx-auto grid w-full max-w-[1100px] gap-10 px-6 pt-12 pb-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:items-center">
           <div>

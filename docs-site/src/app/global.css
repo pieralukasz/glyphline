@@ -60,6 +60,19 @@ html > body[data-scroll-locked] {
     );
 }
 
+/* Phones: the margin line sits 47px in and cuts through content padded 24px; keep only the rules. */
+@media (max-width: 639px) {
+  .gl-ruled {
+    background-image:
+      linear-gradient(to bottom, transparent 55%, var(--color-fd-background)),
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0 31px,
+        color-mix(in oklab, var(--color-fd-primary) 16%, transparent) 31px 32px
+      );
+  }
+}
+
 /* Small uppercase labels: section eyebrows on the home page. */
 .gl-label {
   font-family: var(--font-mono);

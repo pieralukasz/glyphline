@@ -357,6 +357,26 @@
   fill: color-mix(in oklch, var(--color-fd-primary) 30%, transparent);
 }
 
+/* Phones (below Tailwind sm): simpler demos and less empty space on the home page. */
+@media (max-width: 639px) {
+  /* status text gets its own left-aligned row instead of a 13rem box pushed right */
+  .gl-status {
+    flex-basis: 100%;
+    min-width: 0;
+    margin-left: 0;
+    text-align: left;
+  }
+  .gl-home > section:not(.gl-ruled) {
+    padding-block: 2.5rem;
+  }
+  /* the PDF page takes almost the full screen width so its print is as large as it can be */
+  .gl-home .gl-paper {
+    margin-inline: -1rem;
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+  }
+}
+
 /* Method comparison */
 .gl-zoom {
   overflow: auto;
